@@ -18,6 +18,7 @@
 #include "create.hpp"
 #include "dipole.hpp"
 #include "hamr.hpp"
+#include "quantum.hpp"
 #include "spinwaves.hpp" // jrh
 #include "ltmp.hpp"
 #include "sim.hpp"
@@ -178,7 +179,7 @@ void initialize_modules(){
    //---------------------------------------------------------------------------
    // initialise quantum noise and integration
    //---------------------------------------------------------------------------
-	quantum::initialize()
+	quantum::initialize();
 
    return;
 

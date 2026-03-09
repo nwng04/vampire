@@ -46,6 +46,16 @@ namespace quantum{
    //---------------------------------------------------------------------------
    void llg_step();
 
+   //---------------------------------------------------------------------------
+   // Function to get field for quantum noise
+   //---------------------------------------------------------------------------
+   double get_field(int atom, int component, double time_offset);
+
+   //---------------------------------------------------------------------------
+   // Function to increment time for quantum noise
+   //---------------------------------------------------------------------------
+   void increment_time();
+
 } // end of quantum namespace
 
 #endif //QUANTUM_H_

@@ -14,6 +14,7 @@
 #include "errors.hpp"
 #include "sim.hpp"
 #include "vio.hpp"
+#include "quantum.hpp"
 
 // Internal sim header
 #include "internal.hpp"

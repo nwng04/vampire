@@ -25,6 +25,103 @@
 
 namespace quantum{
 
+   bool supported_program(uint64_t& total_simulation_time){
+
+      // set a list of programs assuming a maximum large number
+      std::vector<bool> programs(1000, false);
+      std::vector<uint64_t> simulation_time(1000, 0);
+
+      if(program::program >= 1000){
+         std::cerr << "Programmer error! Program ID in quantum module initialisation exceeds the maximum number of 1000. Decrease program ID or increase number of supported programs" << std::endl;
+         err::vexit();
+      }
+
+      const uint64_t et = sim::equilibration_time;
+      const uint64_t tt = sim::total_time;
+      const uint64_t lt = sim::loop_time;
+
+
+      // Benchmark (total time)
+      programs[0] = true;
+      simulation_time[0] = tt;
+      //programs[program::benchmark] = true;
+
+      // Time series (eq+total time)
+      programs[1] = true;
+      simulation_time[1] = et+tt;
+
+      // Hysteresis (eq+loop time)
+      programs[2] = true;
+      simulation_time[2] = et+lt;
+
+      // Static hysteresis (eq+loop time)
+      programs[3] = true;
+      simulation_time[3] = et+lt;
+
+      // Curie temperature (eq+loop time)
+      programs[4] = true;
+      simulation_time[4] = et+lt;
+
+      // Field cool (not supported - dynamic temperature)
+      programs[5] = false;
+      //simulation_time[5] = et+lt;
+
+      // Temperature pulse (not supported, dynamic temperature)
+      programs[6] = false;
+
+      // HAMR (not supported, dynamic temperature)
+      programs[7] = false;
+
+      // LaGrange multiplier (eq+total time)
+      programs[11] = true;
+      simulation_time[11] = et+tt;
+
+      // Partial hysteresis (eq+loop time)
+      programs[12] = true;
+      simulation_time[12] = et+lt;
+
+      // Localised temperature pulse (not supported, dynamic temperature)
+      programs[13] = false;
+
+      // Effective damping (eq+total time)
+      programs[14] = true;
+      simulation_time[14] = et+tt;
+
+      // FMR (eq+total time)
+      programs[15] = true;
+      simulation_time[15] = et+tt;
+
+      // Local Field cool (not supported - dynamic temperature)
+      programs[16] = false;
+      //simulation_time[16] = et+lt;
+
+      // Electrical pulse (eq+total time)
+      programs[17] = true;
+      simulation_time[17] = et+tt;
+
+      // Field pulse (eq+total time)
+      programs[18] = true;
+      simulation_time[18] = et+tt;
+
+      // Domain walls (eq+total time)
+      programs[52] = true;
+      simulation_time[52] = et+tt;
+
+      // Field sweep (eq+loop time)
+      programs[70] = true;
+      simulation_time[70] = et+lt;
+
+      // Spin waves (eq+total time)
+      programs[74] = true;
+      simulation_time[74] = et+tt;
+
+      total_simulation_time = simulation_time[program::program];
+
+      // return a bool that is true if the current selected program is supported by the quantum thermostat
+      return programs[program::program];
+
+   }
+
    //----------------------------------------------------------------------------
    // Function to initialize quantum module
    //----------------------------------------------------------------------------
@@ -144,103 +241,6 @@ namespace quantum{
       internal::initialised = true;
 
       return;
-
-   }
-
-   bool supported_program(uint64_t& total_simulation_time){
-
-      // set a list of programs assuming a maximum large number
-      std::vector<bool> programs(1000, false);
-      std::vector<uint64_t> simulation_time(1000, 0);
-
-      if(program::program >= 1000){
-         std::cerr << "Programmer error! Program ID in quantum module initialisation exceeds the maximum number of 1000. Decrease program ID or increase number of supported programs" << std::endl;
-         err::vexit();
-      }
-
-      const uint64_t et = sim::equilibration_time;
-      const uint64_t tt = sim::total_time;
-      const uint64_t lt = sim::loop_time;
-
-
-      // Benchmark (total time)
-      programs[0] = true;
-      simulation_time[0] = tt;
-      //programs[program::benchmark] = true;
-
-      // Time series (eq+total time)
-      programs[1] = true;
-      simulation_time[1] = et+tt;
-
-      // Hysteresis (eq+loop time)
-      programs[2] = true;
-      simulation_time[2] = et+lt;
-
-      // Static hysteresis (eq+loop time)
-      programs[3] = true;
-      simulation_time[3] = et+lt;
-
-      // Curie temperature (eq+loop time)
-      programs[4] = true;
-      simulation_time[4] = et+lt;
-
-      // Field cool (not supported - dynamic temperature)
-      programs[5] = false;
-      //simulation_time[5] = et+lt;
-
-      // Temperature pulse (not supported, dynamic temperature)
-      programs[6] = false;
-
-      // HAMR (not supported, dynamic temperature)
-      programs[7] = false;
-
-      // LaGrange multiplier (eq+total time)
-      programs[11] = true;
-      simulation_time[11] = et+tt;
-
-      // Partial hysteresis (eq+loop time)
-      programs[12] = true;
-      simulation_time[12] = et+lt;
-
-      // Localised temperature pulse (not supported, dynamic temperature)
-      programs[13] = false;
-
-      // Effective damping (eq+total time)
-      programs[14] = true;
-      simulation_time[14] = et+tt;
-
-      // FMR (eq+total time)
-      programs[15] = true;
-      simulation_time[15] = et+tt;
-
-      // Local Field cool (not supported - dynamic temperature)
-      programs[16] = false;
-      //simulation_time[16] = et+lt;
-
-      // Electrical pulse (eq+total time)
-      programs[17] = true;
-      simulation_time[17] = et+tt;
-
-      // Field pulse (eq+total time)
-      programs[18] = true;
-      simulation_time[18] = et+tt;
-
-      // Domain walls (eq+total time)
-      programs[52] = true;
-      simulation_time[52] = et+tt;
-
-      // Field sweep (eq+loop time)
-      programs[70] = true;
-      simulation_time[70] = et+lt;
-
-      // Spin waves (eq+total time)
-      programs[74] = true;
-      simulation_time[74] = et+tt;
-
-      total_simulation_time = simulation_time[program::program];
-
-      // return a bool that is true if the current selected program is supported by the quantum thermostat
-      return programs[program::program];
 
    }
 

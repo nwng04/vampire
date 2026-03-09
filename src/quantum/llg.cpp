@@ -110,7 +110,7 @@ namespace quantum{
          H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + quantum::get_field(atom, 2, 0.0);
 
          // Calculate K1
-         spinDynamics(y_in_storage[atom].data(), H.data(), k1_storage[atom].data());
+         spinDynamics(y_in_storage[atom].data(), H.data(), k1_storage[atom].data(), atoms::type_array[atom]);
 
          // Calculate y_pred for k2
          for (size_t i = 0; i < 9; ++i) {
@@ -141,7 +141,7 @@ namespace quantum{
          H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + quantum::get_field(atom, 2, 0.5);
 
          // Calculate K2
-         spinDynamics(y_pred_storage[atom].data(), H.data(), k2_storage[atom].data());
+         spinDynamics(y_pred_storage[atom].data(), H.data(), k2_storage[atom].data(), atoms::type_array[atom]);
 
          // Calculate y_pred for k3
          for (size_t i = 0; i < 9; ++i) {
@@ -173,7 +173,7 @@ namespace quantum{
          H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + quantum::get_field(atom, 2, 0.5);
 
          // Calculate K3
-         spinDynamics(y_pred_storage[atom].data(), H.data(), k3_storage[atom].data());
+         spinDynamics(y_pred_storage[atom].data(), H.data(), k3_storage[atom].data(), atoms::type_array[atom]);
 
          // Calculate y_pred for k4
          for (size_t i = 0; i < 9; ++i) {
@@ -204,7 +204,7 @@ namespace quantum{
          H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + quantum::get_field(atom, 2, 1.0);
 
          // Calculate K4
-         spinDynamics(y_pred_storage[atom].data(), H.data(), k4_storage[atom].data());
+         spinDynamics(y_pred_storage[atom].data(), H.data(), k4_storage[atom].data(), atoms::type_array[atom]);
 
          // Final update and normalization for spin components
          for (size_t i = 0; i < 3; ++i) {
