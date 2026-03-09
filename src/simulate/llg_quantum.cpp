@@ -65,10 +65,9 @@ namespace sim{
    void calculate_random_fields(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse);
    void assign_unique_indices(int n_coarse);
    void precompute_sqrt_PSD(int n, double dt, double T);
-   double PSD(const double& omega, const double& T);
+   double PSD_Old(const double& omega, const double& T);
    double estimate_cutoff_omega_cdf(double T, double target_frac);
    double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx);
-
 
 
    int LLGQinit(){
@@ -433,7 +432,7 @@ namespace sim{
       double df_coarse = 1.0 / (n_coarse * dt_coarse);
       for (int i = 0; i <= n_coarse/2; ++i) {
          double omega = 2.0 * M_PI * i * df_coarse;
-         sqrt_PSD_coarse[i] = std::sqrt(PSD(omega, T));
+         sqrt_PSD_coarse[i] = std::sqrt(PSD_Old(omega, T));
       }
 
       std::cout << "Starting noise generation for " << realizations << " realizations..." << std::endl;
@@ -498,7 +497,7 @@ namespace sim{
       #endif
    }
 
-   double PSD(const double& omega, const double& T) {
+   double PSD_Old(const double& omega, const double& T) {
       const double A = sim::internal::mp[0].A.get();
       const double Gamma = sim::internal::mp[0].Gamma.get();
       const double omega0 = sim::internal::mp[0].omega0.get();
@@ -533,7 +532,7 @@ namespace sim{
       double df = 1.0 / (n * dt);
       for (int i = 0; i <= n/2; ++i) {
          double omega = 2.0 * M_PI * i * df;
-         LLGQ_arrays::sqrt_PSD_buffer[i] = std::sqrt(PSD(omega, T));
+         LLGQ_arrays::sqrt_PSD_buffer[i] = std::sqrt(PSD_Old(omega, T));
       }
    }
 
@@ -547,7 +546,7 @@ namespace sim{
        double domega = omega_max / steps;
        for (int i = 0; i <= steps; ++i) {
            double omega = i * domega;
-           psd_vals[i] = PSD(omega, T);
+           psd_vals[i] = PSD_Old(omega, T);
        }
        double total_area = 0.0;
        for (int i = 0; i < steps; ++i) {
@@ -562,7 +561,7 @@ namespace sim{
            }
        }
        return omega_max;
-   }    
+   }
 
    
 
@@ -575,6 +574,6 @@ namespace sim{
           const size_t index1 = j + atom_idx;
           const size_t index2 = j + atom_idx + 1;
           return coarse_noise[index1] * (1.0 - frac) + coarse_noise[index2] * frac;
-    }
+      }
 
 } // end of sim namespace

@@ -132,7 +132,22 @@ namespace quantum{
       // Do nothing if module not enabled
       if(!enabled) return;
 
+      // Ensure quantum material parameters exist for all materials before indexing.
+      if(internal::mp.size() < static_cast<size_t>(mp::num_materials)){
+         internal::mp.resize(mp::num_materials);
+      }
+
       std::cout << "Initializing Quantum Noise Module" << std::endl;
+      std::cout << "Num of Materials" << mp::num_materials << std::endl;
+      std::cout << "Size of mp" << mp::material.size() << std::endl;
+
+      // Re-initialize compact parameter arrays in case initialize() is called again.
+      material_gamma_array.clear();
+      material_omega0_array.clear();
+      material_A_array.clear();
+      material_gamma_array.reserve(mp::num_materials);
+      material_omega0_array.reserve(mp::num_materials);
+      material_A_array.reserve(mp::num_materials);
 
       // Populate Lorentzian parameter arrays
       for(int m=0; m < mp::num_materials; m++){
@@ -145,6 +160,13 @@ namespace quantum{
          double gamma = internal::mp[m].gamma.get();
          double omega0 = internal::mp[m].omega0.get();
 
+         if(gamma <= 0.0 || omega0 <= 0.0){
+            std::cerr << "Error: quantum material parameters are not set for material " << (m+1) << "." << std::endl;
+            std::cerr << "Set both 'material[" << (m+1) << "]:quantum-lorentzian-width' and "
+                      << "'material[" << (m+1) << "]:quantum-lorentzian-central-frequency' in the material file." << std::endl;
+            err::vexit();
+         }
+
          // Calculate amplitude from damping parameter and Gamma and omega0
          double A = alpha * pow(omega0, 4) / gamma;
 
@@ -152,13 +174,10 @@ namespace quantum{
          material_gamma_array.push_back(gamma);
          material_omega0_array.push_back(omega0);
          material_A_array.push_back(A);
-
       }
-
 
       // Disable standard thermal field (index 3)
       sim::hamiltonian_simulation_flags[3] = 0;
-
 
       // Setting up the window
       uint64_t total_simulation_time = 0;

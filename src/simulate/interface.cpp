@@ -151,6 +151,8 @@ namespace sim{
          test="spin-lattice";
          if( value == test ){
             sim::integrator = sim::suzuki_trotter;
+            quantum::enabled = true;
+            // NOTE: SET FLAG TO ENABLE QUANTUM NOISE IN SLD MODULE?
             return true;
          }
          //

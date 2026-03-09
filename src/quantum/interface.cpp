@@ -133,13 +133,13 @@ namespace quantum{
       }
       //------------------------------------------------------------------------
       // Assume S0 == mu_B (until we develop a suitable s-d model description)
-      //test = "quantum-S0";
-      //if( word == test ){
-      //   double S0 = vin::str_to_double(value);
-      //   vin::check_for_valid_value(S0, word, line, prefix, unit, "none", 0.0, 100.0, "material", "> 0");
-      //   internal::mp[super_index].S0.set(S0);
-      //   return true;
-      //}
+      test = "quantum-S0";
+      if( word == test ){
+         double S0 = vin::str_to_double(value);
+         vin::check_for_valid_value(S0, word, line, prefix, unit, "none", 0.0, 100.0, "material", "> 0");
+         internal::mp[super_index].S0.set(S0);
+         return true;
+      }
 
       return false;
 

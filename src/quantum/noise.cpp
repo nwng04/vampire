@@ -112,9 +112,13 @@ namespace quantum{
       //---------------------------------------------------------------------------
       void calculate_noise(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse_total, std::vector<double>& noise_field) {
          #ifdef FFT
-         if (window_size % 6 != 0) {
-             std::cerr << "Error: Window size must be divisible by 6." << std::endl;
-             return;
+         if (window_size % 6 != 0) { 
+            // If window size is not divisible by 6, adjust to the closest multiple of 6
+            const int old_window_size = window_size;
+            window_size = (window_size / 6) * 6;
+             std::cerr << "Warning: Window size must be divisible by 6." << std::endl;
+             std::cerr << "Adjusting window size from " << old_window_size << " to " << window_size << std::endl;
+             //return;
          }
          int segment_size = window_size / 6;
 
@@ -143,7 +147,7 @@ namespace quantum{
          double df_window = 1.0 / (window_size * dt_coarse);
          for (int i = 0; i <= window_size / 2; ++i) {
              double omega = 2.0 * M_PI * i * df_window;
-             sqrt_PSD_window[i] = std::sqrt(PSD(omega, T));
+             sqrt_PSD_window[i] = std::sqrt(PSD(omega, T, 0));
          }
 
          // Buffer to hold white noise

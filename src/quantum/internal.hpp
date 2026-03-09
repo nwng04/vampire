@@ -71,12 +71,14 @@ namespace quantum{
             //----------------
             set_double_t gamma;      // Lorentzian width parameter
             set_double_t omega0;     // Lorentzian central frequency parameter
+            set_double_t S0;         // Spin (assumed to be mu_B until we develop a suitable s-d model description)
 
             // constructor
             mp_t (const unsigned int max_materials = 100)
             {
                gamma.set(0.0); // default value
                omega0.set(0.0); // default value
+               S0.set(0.0); // default value
             }; // end of constructor
 
       };
@@ -131,8 +133,9 @@ namespace quantum{
       // Internal function declarations
       //-------------------------------------------------------------------------
 
-      double PSD(const double& omega,
-                 const double& T);
+      double PSD(double omega,
+                 double T,
+                 int material);
 
       void calculate_noise(int realizations,
                            int n_fine,
