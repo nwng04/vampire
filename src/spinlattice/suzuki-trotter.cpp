@@ -89,9 +89,6 @@ namespace sld{
 
    int suzuki_trotter(){
 
-      // Check for initialisation of LLG integration arrays
-      //if(sld::internal::initialise_noise==false) quantum::initialize();
-
       const int num_atoms=atoms::num_atoms;
       double cay_dt=-mp::dt/4.0;//-dt4*consts::gyro - mp::dt contains gamma;
       double dt2=0.5*mp::dt_SI*1e12;
