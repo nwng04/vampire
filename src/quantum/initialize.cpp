@@ -205,7 +205,10 @@ namespace quantum{
       uint64_t n_fine = sim::total_time + 1;
 
       // Coarse time array (used for noise generation)
-      int M_decimation = internal::M_decimation;
+      double omega_cutoff = quantum::internal::estimate_cutoff_omega_cdf(sim::temperature, 0.99999);
+      internal::M_decimation = static_cast<int>(std::ceil((M_PI / omega_cutoff) / dt_fine));
+      M_decimation = internal::M_decimation;
+
       int n_coarse = window_size;
 
       std::cout << "Quantum noise module simulation parameters:" << std::endl;

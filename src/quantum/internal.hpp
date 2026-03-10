@@ -151,6 +151,9 @@ namespace quantum{
                        int M,
                        size_t atom_idx);
 
+      double estimate_cutoff_omega_cdf(double T,
+                        double target_frac);
+
       void assign_unique_indices(int n_coarse);
 
    } // end of internal namespace

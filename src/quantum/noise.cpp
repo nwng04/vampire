@@ -242,10 +242,10 @@ namespace quantum{
          #endif
       }
 
-      //---------------------------------------------------------------------------
-      // Get noise value with interpolation
-      //---------------------------------------------------------------------------
-      double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx) {
+        //---------------------------------------------------------------------------
+        // Get noise value with interpolation
+        //---------------------------------------------------------------------------
+        double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx) {
           double coarse_idx_float = fine_step_idx / M;
           size_t j = static_cast<size_t>(coarse_idx_float);
           double frac = coarse_idx_float - j;
@@ -258,7 +258,34 @@ namespace quantum{
           if (index2 >= coarse_noise.size()) return coarse_noise[index1];
 
           return coarse_noise[index1] * (1.0 - frac) + coarse_noise[index2] * frac;
-      }
+        }
+
+        // Function to estimate cutoff frequency from noise_interpolated.cpp
+        double estimate_cutoff_omega_cdf(double T, double target_frac) { 
+            const double omega0 = mp[0].omega0.get();
+            if (omega0 <= 0) return 1.0;
+            double omega_max = 10.0 * omega0;
+            int steps = 50000;
+            std::vector<double> psd_vals(steps + 1);
+            double domega = omega_max / steps;
+            for (int i = 0; i <= steps; ++i) {
+                double omega = i * domega;
+                psd_vals[i] = PSD(omega, T, 0.0);
+            }
+            double total_area = 0.0;
+            for (int i = 0; i < steps; ++i) {
+                total_area += 0.5 * (psd_vals[i] + psd_vals[i + 1]) * domega;
+            }
+            if (total_area <= 1e-12) return omega_max;
+            double cum_area = 0.0;
+            for (int i = 0; i <= steps; ++i) {
+                if (i > 0) cum_area += 0.5 * (psd_vals[i - 1] + psd_vals[i]) * domega;
+                if (cum_area >= target_frac * total_area) {
+                    return i * domega;
+                }
+            }
+            return omega_max;
+        }
 
    } // end of internal namespace
 
