@@ -197,7 +197,7 @@ namespace quantum{
 
       // if window size is zero, set to simulation length
       if(window_size == 0){
-         window_size = total_simulation_time + 1;
+         window_size = 500;//total_simulation_time + 1;
       }
 
       // Fine time array (used for spin dynamics)
