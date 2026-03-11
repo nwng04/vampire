@@ -67,7 +67,10 @@ namespace config{
                   }
                }
             } // end of sld check
-
+            else {
+               // SLD enabled -> no bounds filtering
+               config::internal::local_output_atom_list.push_back(atom);
+            }
          }
 
          //------------------------------------------------------

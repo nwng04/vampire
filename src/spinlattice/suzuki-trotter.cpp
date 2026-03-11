@@ -15,6 +15,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <iomanip>
 
 // Vampire headers
 #include "atoms.hpp"
@@ -86,32 +87,58 @@ namespace sld{
 
    }
 
+   int initialise_quantum_noise(){
+      // check calling of routine if error checking is activated
+      if(err::check==true){std::cout << "sim::suzuki-trotter has been called" << std::endl;}
 
+      // Set number of realizations (full field, for final release allow even smaller number of realizations)
+      const int num_atoms = atoms::num_atoms;
+      int realizations = num_atoms * 3 + 4;
+      sim::noise_index = 0;
+
+      // Disable external thermal field calculations
+      sim::hamiltonian_simulation_flags[3] = 0;
+
+      // --- Interpolation Setup ---
+      const double dt_fine = mp::dt;
+      const int n_fine = static_cast<int>(sim::equilibration_time) + 1;
+
+      // Calculate cutoff frequency and decimation factor
+      double omega_cutoff = sim::estimate_cutoff_omega_cdf(sim::temperature, 0.99999);
+      sim::M_decimation = static_cast<int>(std::ceil((M_PI / omega_cutoff) / dt_fine));
+
+      const int n_coarse = (n_fine > 0) ? ((n_fine - 1) / sim::M_decimation + 1) : 0;
+      double mem_red = 100.0 * (1.0 - static_cast<double>(n_coarse) / n_fine);
+      std::cout << "Quantum noise interpolation enabled." << std::endl;
+      std::cout << "Decimation factor M=" << sim::M_decimation << ", estimated memory reduction=" << std::fixed << std::setprecision(1) << mem_red << "%" << std::endl;
+
+      // Assign unique indices for random fields
+      sim::assign_unique_indices(n_coarse);
+
+      // Generate random fields directly on coarse grid and store for interpolation
+      sim::calculate_random_fields(realizations, n_fine, dt_fine, sim::M_decimation, sim::temperature, n_coarse);
+
+      sld::internal::initialise_noise = true;
+      return EXIT_SUCCESS;
+   }
 
    int suzuki_trotter(){
       const int num_atoms=atoms::num_atoms;
       double cay_dt=-mp::dt/4.0;//-dt4*consts::gyro - mp::dt contains gamma;
       double dt2=0.5*mp::dt_SI*1e12;
 
+      // Check for initialisation of LLG integration arrays
+         if(sld::internal::initialise_noise==false) initialise_quantum_noise();
 
-
+      // NOTE: NOISE VARIABLES TO CHANGE
       //vectors for thermal noise spin plus lattice
       std::vector <double> Hx_th(atoms::x_spin_array.size());
-   	  std::vector <double> Hy_th(atoms::x_spin_array.size());
-   	  std::vector <double> Hz_th(atoms::x_spin_array.size());
+   	std::vector <double> Hy_th(atoms::x_spin_array.size());
+   	std::vector <double> Hz_th(atoms::x_spin_array.size());
 
       generate (Hx_th.begin(),Hx_th.end(), mtrandom::gaussian);
       generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
       generate (Hz_th.begin(),Hz_th.end(), mtrandom::gaussian);
-
-      //vectors for thermal forces
-      std::vector <double> Fx_th(atoms::x_spin_array.size());
-      std::vector <double> Fy_th(atoms::x_spin_array.size());
-      std::vector <double> Fz_th(atoms::x_spin_array.size());
-
-      generate (Fx_th.begin(),Fx_th.end(), mtrandom::gaussian);
-      generate (Fy_th.begin(),Fy_th.end(), mtrandom::gaussian);
-      generate (Fz_th.begin(),Fz_th.end(), mtrandom::gaussian);
 
 
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
@@ -288,17 +315,18 @@ namespace sld{
       const unsigned int imat = atoms::type_array[atom];
       double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
       double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
-      double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+      //double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+      double quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
 
        //if during equilibration:
        if (sim::time < sim::equilibration_time) {
               f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
-              velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
+              //velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
        }
 
-             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
-             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
+             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
+             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
 
              atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::x_velo_array[atom];
              atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::y_velo_array[atom];
@@ -358,20 +386,21 @@ namespace sld{
         const unsigned int imat = atoms::type_array[atom];
         double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
-        double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+        //double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+        double quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
 
 
           //if during equilibration:
           if (sim::time < sim::equilibration_time) {
                 f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
-                velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
+                //velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
           }
 
-
-         atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
-         atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-         atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
-
+         atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
+         atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*quantum_noise;
+         atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
+         //atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+         //atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
 
       }
 

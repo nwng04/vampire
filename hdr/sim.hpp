@@ -277,6 +277,25 @@ namespace sim{
    std::vector<double> get_stt_rj(); // array of stt relaxation constants
    std::vector<double> get_stt_pj(); // array of stt precession constants
 
+
+	// Quantum declarations
+	extern double estimate_cutoff_omega_cdf(double T, double target_frac);
+	extern double PSD(const double& omega, const double& T);
+	extern void precompute_sqrt_PSD(int n, double dt, double T);
+	extern double get_noise(const std::vector<double>& coarse_noise, double fine_step_idx, int M, size_t atom_idx);
+	extern void assign_unique_indices(int n_coarse);
+	extern void calculate_random_fields(int realizations, int n_fine, double dt_fine, int M, double T, int n_coarse);
+
+	// Arrays for noise generation (now storing coarse-grained noise)
+    extern std::vector<double> coarse_noise_field;
+    extern std::vector<double> sqrt_PSD_buffer; // Restored buffer
+    extern double noise_index;
+    extern int M_decimation;    //< Decimation factor for noise interpolation
+
+	// Indices for random fields
+	extern std::vector<double> atom_idx_x;
+	extern std::vector<double> atom_idx_y;
+    extern std::vector<double> atom_idx_z;
 }
 
 /*namespace ckp{

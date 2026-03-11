@@ -95,7 +95,7 @@ namespace sim{
       // Set number of realizations (full field, for final release allow even smaller number of realizations)
       const int num_atoms = atoms::num_atoms;
       int realizations = num_atoms * 3 + 4;
-      LLGQ_arrays::noise_index = 0;
+      noise_index = 0;
 
       // Disable external thermal field calculations
       sim::hamiltonian_simulation_flags[3] = 0;
@@ -154,12 +154,12 @@ namespace sim{
             y_in_storage[atom][0] = atoms::x_spin_array[atom];
             y_in_storage[atom][1] = atoms::y_spin_array[atom];
             y_in_storage[atom][2] = atoms::z_spin_array[atom];
-            y_in_storage[atom][3] = LLGQ_arrays::x_v_array[atom];
-            y_in_storage[atom][4] = LLGQ_arrays::y_v_array[atom];
-            y_in_storage[atom][5] = LLGQ_arrays::z_v_array[atom];
-            y_in_storage[atom][6] = LLGQ_arrays::x_w_array[atom];
-            y_in_storage[atom][7] = LLGQ_arrays::y_w_array[atom];
-            y_in_storage[atom][8] = LLGQ_arrays::z_w_array[atom];
+            y_in_storage[atom][3] = x_v_array[atom];
+            y_in_storage[atom][4] = y_v_array[atom];
+            y_in_storage[atom][5] = z_v_array[atom];
+            y_in_storage[atom][6] = x_w_array[atom];
+            y_in_storage[atom][7] = y_w_array[atom];
+            y_in_storage[atom][8] = z_w_array[atom];
          }
 
 
@@ -291,17 +291,17 @@ namespace sim{
             atoms::z_spin_array[atom] = y_pred_storage[atom][2];
 
             // Update auxiliary variables
-            LLGQ_arrays::x_v_array[atom] = y_in_storage[atom][3] + (dt_over_6) * (k1_storage[atom][3] + 2.0 * k2_storage[atom][3] + 2.0 * k3_storage[atom][3] + k4_storage[atom][3]);
-            LLGQ_arrays::y_v_array[atom] = y_in_storage[atom][4] + (dt_over_6) * (k1_storage[atom][4] + 2.0 * k2_storage[atom][4] + 2.0 * k3_storage[atom][4] + k4_storage[atom][4]);
-            LLGQ_arrays::z_v_array[atom] = y_in_storage[atom][5] + (dt_over_6) * (k1_storage[atom][5] + 2.0 * k2_storage[atom][5] + 2.0 * k3_storage[atom][5] + k4_storage[atom][5]);
-            LLGQ_arrays::x_w_array[atom] = y_in_storage[atom][6] + (dt_over_6) * (k1_storage[atom][6] + 2.0 * k2_storage[atom][6] + 2.0 * k3_storage[atom][6] + k4_storage[atom][6]);
-            LLGQ_arrays::y_w_array[atom] = y_in_storage[atom][7] + (dt_over_6) * (k1_storage[atom][7] + 2.0 * k2_storage[atom][7] + 2.0 * k3_storage[atom][7] + k4_storage[atom][7]);
-            LLGQ_arrays::z_w_array[atom] = y_in_storage[atom][8] + (dt_over_6) * (k1_storage[atom][8] + 2.0 * k2_storage[atom][8] + 2.0 * k3_storage[atom][8] + k4_storage[atom][8]);
+            x_v_array[atom] = y_in_storage[atom][3] + (dt_over_6) * (k1_storage[atom][3] + 2.0 * k2_storage[atom][3] + 2.0 * k3_storage[atom][3] + k4_storage[atom][3]);
+            y_v_array[atom] = y_in_storage[atom][4] + (dt_over_6) * (k1_storage[atom][4] + 2.0 * k2_storage[atom][4] + 2.0 * k3_storage[atom][4] + k4_storage[atom][4]);
+            z_v_array[atom] = y_in_storage[atom][5] + (dt_over_6) * (k1_storage[atom][5] + 2.0 * k2_storage[atom][5] + 2.0 * k3_storage[atom][5] + k4_storage[atom][5]);
+            x_w_array[atom] = y_in_storage[atom][6] + (dt_over_6) * (k1_storage[atom][6] + 2.0 * k2_storage[atom][6] + 2.0 * k3_storage[atom][6] + k4_storage[atom][6]);
+            y_w_array[atom] = y_in_storage[atom][7] + (dt_over_6) * (k1_storage[atom][7] + 2.0 * k2_storage[atom][7] + 2.0 * k3_storage[atom][7] + k4_storage[atom][7]);
+            z_w_array[atom] = y_in_storage[atom][8] + (dt_over_6) * (k1_storage[atom][8] + 2.0 * k2_storage[atom][8] + 2.0 * k3_storage[atom][8] + k4_storage[atom][8]);
 
          }
 
          // Increment noise index
-         LLGQ_arrays::noise_index += 1;
+         noise_index += 1;
 
          return;
       }
@@ -335,17 +335,17 @@ namespace sim{
 
       std::cout << "Assigning indices for " << num_atoms << " atoms with " << n_coarse << " coarse steps." << std::endl;
 
-      LLGQ_arrays::atom_idx_x.resize(num_atoms);
-      LLGQ_arrays::atom_idx_y.resize(num_atoms);
-      LLGQ_arrays::atom_idx_z.resize(num_atoms);
+      atom_idx_x.resize(num_atoms);
+      atom_idx_y.resize(num_atoms);
+      atom_idx_z.resize(num_atoms);
 
       for (int atom = 0; atom < num_atoms; atom++) {
          // Use 64-bit arithmetic to prevent overflow
          const size_t atom_ll = static_cast<size_t>(atom);
          const size_t n_coarse_ll = static_cast<size_t>(n_coarse);
-         LLGQ_arrays::atom_idx_x[atom] = 3 * atom_ll * n_coarse_ll;
-         LLGQ_arrays::atom_idx_y[atom] = 3 * atom_ll * n_coarse_ll + n_coarse_ll;
-         LLGQ_arrays::atom_idx_z[atom] = 3 * atom_ll * n_coarse_ll + 2*n_coarse_ll;
+         atom_idx_x[atom] = 3 * atom_ll * n_coarse_ll;
+         atom_idx_y[atom] = 3 * atom_ll * n_coarse_ll + n_coarse_ll;
+         atom_idx_z[atom] = 3 * atom_ll * n_coarse_ll + 2*n_coarse_ll;
       }
    }
 
@@ -409,13 +409,13 @@ namespace sim{
       try {
          // Use 64-bit arithmetic to avoid overflow
          const size_t safe_size = static_cast<size_t>(total_elements);
-         LLGQ_arrays::coarse_noise_field.resize(safe_size);
+         coarse_noise_field.resize(safe_size);
          std::cout << "Successfully allocated noise field vector with size: " << safe_size 
                    << " (" << (safe_size*sizeof(double))/(1024*1024) << " MB)" << std::endl;
       } catch (const std::length_error& e) {
          std::cerr << "std::length_error during resize: " << e.what() << std::endl;
          std::cerr << "Requested size: " << total_elements << std::endl;
-         std::cerr << "Max size: " << LLGQ_arrays::coarse_noise_field.max_size() << std::endl;
+         std::cerr << "Max size: " << coarse_noise_field.max_size() << std::endl;
          err::vexit();
       } catch (const std::bad_alloc& e) {
          std::cerr << "std::bad_alloc during resize: " << e.what() << std::endl;
@@ -460,7 +460,7 @@ namespace sim{
          for (int j = 0; j < n_coarse; ++j) {
             // Use 64-bit arithmetic to prevent array index overflow
             const size_t index = static_cast<size_t>(j) + static_cast<size_t>(r) * static_cast<size_t>(n_coarse);
-            LLGQ_arrays::coarse_noise_field[index] = result[j] * norm_factor * inv_sqrt_S0 * scale;
+            coarse_noise_field[index] = result[j] * norm_factor * inv_sqrt_S0 * scale;
          }
 
          // Progress bar update - show progress every 5%
@@ -502,6 +502,8 @@ namespace sim{
       const double Gamma = sim::internal::mp[0].Gamma.get();
       const double omega0 = sim::internal::mp[0].omega0.get();
 
+      std::cout << "Calculating PSD for omega=" << omega << ", T=" << T << ", omega0=" << omega0 << ", Gamma = " << Gamma << ", A = " << A << std::endl;
+
       double x = (T > 1e-12) ? omega / (2 * T) : omega;  // Avoid division by zero
       double lorentzian_denom = (omega0 * omega0 - omega * omega) * (omega0 * omega0 - omega * omega) + Gamma * Gamma * omega * omega;
       if (lorentzian_denom < 1e-12) lorentzian_denom = 1e-12; // Avoid division by zero
@@ -528,11 +530,11 @@ namespace sim{
 
    void precompute_sqrt_PSD(int n, double dt, double T) {
       if (n <= 0) return;
-      LLGQ_arrays::sqrt_PSD_buffer.resize(n/2 + 1);
+      sqrt_PSD_buffer.resize(n/2 + 1);
       double df = 1.0 / (n * dt);
       for (int i = 0; i <= n/2; ++i) {
          double omega = 2.0 * M_PI * i * df;
-         LLGQ_arrays::sqrt_PSD_buffer[i] = std::sqrt(PSD(omega, T));
+         sqrt_PSD_buffer[i] = std::sqrt(PSD(omega, T));
       }
    }
 

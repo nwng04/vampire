@@ -315,6 +315,18 @@ namespace sld{
     extern std::vector <int> all_atoms_octant_end_index;
     extern std::vector <int> all_atoms_octant;
 
+      // Arrays for noise generation (now storing coarse-grained noise)
+      extern std::vector<double> coarse_noise_field;
+      extern std::vector<double> sqrt_PSD_buffer; // Restored buffer
+      extern double noise_index;
+      extern int M_decimation;    //< Decimation factor for noise interpolation
+
+      // Indices for random fields
+      extern std::vector<double> atom_idx_x;
+      extern std::vector<double> atom_idx_y;
+      extern std::vector<double> atom_idx_z;
+
+      extern bool initialise_noise; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
       //-------------------------------------------------------------------------
       // Internal function declarations

@@ -122,17 +122,6 @@ namespace sim{
    std::vector<std::vector<double>> y_pred_storage;
    std::vector<std::vector<double>> y_in_storage;
 
-   // Arrays for noise generation (now storing coarse-grained noise)
-   std::vector<double> coarse_noise_field;
-   std::vector<double> sqrt_PSD_buffer; // Restored buffer
-   double noise_index;
-   int M_decimation;    //< Decimation factor for noise interpolation
-
-   // Indices for random fields
-   std::vector<double> atom_idx_x;
-   std::vector<double> atom_idx_y;
-   std::vector<double> atom_idx_z;
-
    bool LLG_set=false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
    }
@@ -151,5 +140,16 @@ namespace sim{
    std::vector<double> get_stt_pj(){
       return sim::internal::stt_pj;
    }
+
+   // Arrays for noise generation (now storing coarse-grained noise)
+   std::vector<double> coarse_noise_field;
+   std::vector<double> sqrt_PSD_buffer; // Restored buffer
+   double noise_index;
+   int M_decimation;    //< Decimation factor for noise interpolation
+
+   // Indices for random fields
+   std::vector<double> atom_idx_x;
+   std::vector<double> atom_idx_y;
+   std::vector<double> atom_idx_z;
 
 } // end of sim namespace

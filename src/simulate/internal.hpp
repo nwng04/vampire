@@ -123,17 +123,6 @@ namespace sim{
    extern std::vector<std::vector<double>> y_pred_storage;
    extern std::vector<std::vector<double>> y_in_storage;
 
-   // Arrays for noise generation (now storing coarse-grained noise)
-   extern std::vector<double> coarse_noise_field;
-   extern std::vector<double> sqrt_PSD_buffer; // Restored buffer
-   extern double noise_index;
-   extern int M_decimation;    //< Decimation factor for noise interpolation
-
-   // Indices for random fields
-   extern std::vector<double> atom_idx_x;
-   extern std::vector<double> atom_idx_y;
-   extern std::vector<double> atom_idx_z;
-
    extern bool LLG_set; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
    }

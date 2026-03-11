@@ -102,7 +102,8 @@ namespace sld{
       std::vector <int> all_atoms_octant_start_index;
       std::vector <int> all_atoms_octant_end_index;
       std::vector <int> all_atoms_octant;
-
+      
+      bool initialise_noise = false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
 
    } // end of internal namespace
 
