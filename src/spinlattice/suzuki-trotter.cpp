@@ -133,7 +133,7 @@ namespace sld{
       double dt2=0.5*mp::dt_SI*1e12;
 
       // Check for initialisation of LLG integration arrays
-         if(sld::internal::initialise_noise==false) initialise_quantum_noise();
+      if(sld::internal::initialise_noise==false) initialise_quantum_noise();
 
       // NOTE: NOISE VARIABLES TO CHANGE
       //vectors for thermal noise spin plus lattice

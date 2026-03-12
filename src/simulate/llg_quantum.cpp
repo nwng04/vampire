@@ -434,6 +434,8 @@ namespace sim{
          double omega = 2.0 * M_PI * i * df_coarse;
          sqrt_PSD_coarse[i] = std::sqrt(PSD(omega, T));
       }
+      
+      std::cout << "Calculating PSD for T=" << T << ", omega0=" << sim::internal::mp[0].omega0.get() << ", Gamma = " << sim::internal::mp[0].Gamma.get() << ", A = " << sim::internal::mp[0].A.get() << std::endl;
 
       std::cout << "Starting noise generation for " << realizations << " realizations..." << std::endl;
       for (int r = 0; r < realizations; ++r) {
@@ -502,7 +504,7 @@ namespace sim{
       const double Gamma = sim::internal::mp[0].Gamma.get();
       const double omega0 = sim::internal::mp[0].omega0.get();
 
-      std::cout << "Calculating PSD for omega=" << omega << ", T=" << T << ", omega0=" << omega0 << ", Gamma = " << Gamma << ", A = " << A << std::endl;
+      //std::cout << "Calculating PSD for omega=" << omega << ", T=" << T << ", omega0=" << omega0 << ", Gamma = " << Gamma << ", A = " << A << std::endl;
 
       double x = (T > 1e-12) ? omega / (2 * T) : omega;  // Avoid division by zero
       double lorentzian_denom = (omega0 * omega0 - omega * omega) * (omega0 * omega0 - omega * omega) + Gamma * Gamma * omega * omega;
