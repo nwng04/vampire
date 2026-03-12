@@ -18,6 +18,8 @@
 #include "sld.hpp"
 #include "errors.hpp"
 #include "vio.hpp"
+#include "sim.hpp"
+#include "../simulate/internal.hpp"
 
 // sld module headers
 #include "internal.hpp"
@@ -123,7 +125,6 @@ namespace sld{
    // Function to process material parameters
    //---------------------------------------------------------------------------
    bool match_material_parameter(std::string const word, std::string const value, std::string const unit, int const line, int const super_index, const int sub_index){
-
       // add prefix string
       std::string prefix="material:";
 
@@ -175,6 +176,34 @@ namespace sld{
          vin::check_for_valid_value(c0, word, line, prefix, unit, "mass", 0, 1,"input","0 - 1");
          sld::internal::mp[super_index].C0.set(c0);
          return true;
+      }
+
+      //------------------------------------------------------------
+      test="A"; // what is this value for?
+      if(word==test){
+          sim::internal::mp[super_index].A.set(std::stod(value)); // need to error check these
+          //std::cout << "Assigned A: " << read_material[super_index].A << std::endl; // Debug output
+          return true;
+      }
+      //------------------------------------------------------------
+      test="Gamma";
+      if(word==test){
+          sim::internal::mp[super_index].Gamma.set(std::stod(value));
+          return true;
+      }
+      //------------------------------------------------------------
+      test="omega0";
+      if(word==test){
+          sim::internal::mp[super_index].omega0.set(std::stod(value));
+          //std::cout << "Assigned omega0: " << read_material[super_index].omega0 << std::endl; // Debug output
+          return true;
+      }
+      //------------------------------------------------------------
+      test="S0";
+      if(word==test){
+          sim::internal::mp[super_index].S0.set(std::stod(value));
+          //std::cout << "Assigned S0: " << read_material[super_index].S0 << std::endl; // Debug output
+          return true;
       }
 
 
