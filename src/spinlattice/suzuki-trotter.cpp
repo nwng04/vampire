@@ -26,6 +26,11 @@
 #include "sim.hpp"
 #include "sld.hpp"
 
+// Library for FFT
+#ifdef FFT
+#include <fftw3.h>
+#endif
+
 //sld module headers M Strungaru
 #include "internal.hpp"
 
