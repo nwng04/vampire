@@ -71,6 +71,24 @@ void command_line_args(int argc, char* argv[]){
          }
       }
 
+      //-----------------------------
+      // output file name
+      //-----------------------------
+      else if(sw=="--output-file"){
+         // check number of args not exceeded
+         if(arg+1 < argc){
+            arg++;
+            vout::output_file_name = string(argv[arg]);
+         }
+         else{
+            terminaltextcolor(RED);
+            std::cerr << "Error - no file specified for \'--output-file\' command line option" << std::endl;
+            terminaltextcolor(WHITE);
+            err::vexit();
+            return;
+         }
+      }
+
       else{
          terminaltextcolor(RED);
          std::cerr << "Error - unknown command line parameter \'" << sw << "\'" << std::endl;
