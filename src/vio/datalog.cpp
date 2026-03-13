@@ -380,20 +380,19 @@ namespace vout{
 			vmpi::TotalWaitTime=0.0;
 		}
 		#endif
-
-      // check for open ofstream on root process only
+ 
+	  // check for open ofstream on root process only
       if(vmpi::my_rank == 0){
          if(!zmag.is_open()){
             // check for checkpoint continue and append data
-            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open("output",std::ofstream::app);
+            if(sim::load_checkpoint_flag && sim::load_checkpoint_continue_flag) zmag.open(vout::output_file_name,std::ofstream::app);
             // otherwise overwrite file
             else{
-               zmag.open("output",std::ofstream::trunc);
+               zmag.open(vout::output_file_name,std::ofstream::trunc);
                // write file header information
                write_output_file_header(zmag, file_output_list);
             }
-         }
-      }
+        }
 
       // Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
       if(sim::time%vout::output_rate==0){
