@@ -393,7 +393,7 @@ namespace vout{
                write_output_file_header(zmag, file_output_list);
             }
         }
-
+	}
       // Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
       if(sim::time%vout::output_rate==0){
          write_out(zmag,file_output_list);
