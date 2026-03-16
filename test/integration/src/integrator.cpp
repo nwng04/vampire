@@ -14,13 +14,14 @@
 
 // module headers
 #include "internal.hpp"
+#include "sld.hpp"
 
 //------------------------------------------------------------------------------
 // Test to verify consistent time evolution for different integrators
 //     Note: this is a regression test rather than absolute as some tests
 //           are stochastic in nature
 //------------------------------------------------------------------------------
-bool integrator_test(const std::string dir, double rx, double ry, double rz, const std::string executable){
+bool integrator_test(const std::string integrator, const std::string dir, const double expected_values[], const int filerow, const std::string executable){
 
    // get root directory
    std::string path = std::filesystem::current_path();
@@ -34,6 +35,8 @@ bool integrator_test(const std::string dir, double rx, double ry, double rz, con
    int vmp = vt::system(executable);
    if( vmp != 0){
       std::cerr << "Error running vampire. Returning as failed test." << std::endl;
+      // Ensure subsequent tests run from the integration root directory.
+      vt::chdir(path);
       return false;
    }
 
@@ -42,9 +45,15 @@ bool integrator_test(const std::string dir, double rx, double ry, double rz, con
    // open output file
    std::ifstream ifile;
    ifile.open("output");
+   if(!ifile.is_open()){
+      std::cout << "FAIL | output file not found" << std::endl;
+      vt::chdir(path);
+      return false;
+   }
 
-   // read value after header
-   for(int i=0; i<982; i++) getline(ifile, line);
+   // Read a deterministic row from output.
+   for(int i=0; i<filerow; i++) getline(ifile, line);
+
    std::stringstream liness(line);
    double v1 = 0.0;
    double vx = 0.0;
@@ -55,22 +64,34 @@ bool integrator_test(const std::string dir, double rx, double ry, double rz, con
    liness >> v1 >> vx >> vy >> vz >> vm;
 
    // cleanup
-   vt::system("rm output log");
+   //vt::system("rm -f output log");
 
    // return to parent directory
    if( !vt::chdir(path) ) return false;
 
    // now test value obtained from code
-   const double ratiox = vx/rx;
-   const double ratioy = vy/ry;
-   const double ratioz = vz/rz;
+   bool ok = false;
 
-   if(ratiox >0.99999 && ratiox < 1.00001 && ratioy >0.99999 && ratioy < 1.00001 && ratioz >0.99999 && ratioz < 1.00001){
+   const double ratiox = vx/expected_values[1];
+   const double ratioy = vy/expected_values[2];
+   const double ratioz = vz/expected_values[3];
+   ok = ratiox >0.99999 && ratiox < 1.00001 && ratioy >0.99999 && ratioy < 1.00001 && ratioz >0.99999 && ratioz < 1.00001;
+
+   if(integrator == "suzuki-trotter"){
+      const double tol_t = 1.0e-16;
+      const double tol_m = 1.0e-16;
+
+      ok = ok &&
+           std::abs(v1 - expected_values[0]) <= tol_t &&
+           std::abs(vm - expected_values[4]) <= tol_m;
+   }
+
+   if(ok){
       std::cout << "OK" << std::endl;
       return true;
    }
    else{
-      std::cout << "FAIL | expected: " << rx << "\t" << ry << "\t" << rz << "\t" << "\tobtained:  " << vx << "\t" << vy << "\t" << vz << "\t" << "\t" << line << std::endl;
+      std::cout << "FAIL | expected: " << expected_values[0] << "\t" << expected_values[1] << "\t" << expected_values[2] << "\t" << expected_values[3] << "\t" << expected_values[4] << "\tobtained: " << v1 << "\t" << vx << "\t" << vy << "\t" << vz << "\t" << vm << "\t" << line << std::endl;
       return false;
    }
 

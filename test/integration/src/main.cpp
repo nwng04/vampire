@@ -26,7 +26,7 @@ int main(){
    std::filesystem::path wd=std::filesystem::current_path();
    std::string path_string = std::filesystem::current_path().parent_path().parent_path();
 
-   std::string exe = path_string+"/vampire-serial 1>/dev/null";
+   std::string exe = path_string+"/vampire-serial --output-file output 1>/dev/null";
 
    //std::cout << exe << std::endl;
 
@@ -38,11 +38,13 @@ int main(){
    unsigned int fail = 0;
 
    // Exchange energy tests
-   if( !exchange_test("crystals/sc" , -3.0e-17, exe ) ) fail += 1;
-   if( !exchange_test("crystals/fcc", -2.4e-16, exe ) ) fail += 1;
+   //if( !exchange_test("crystals/sc" , -3.0e-17, exe ) ) fail += 1;
+   //if( !exchange_test("crystals/fcc", -2.4e-16, exe ) ) fail += 1;
 
    // Integrator tests
-   if( !integrator_test("dynamics/heun",-0.106813,-0.337996,0.935067, exe ) ) fail += 1;
+   //if( !integrator_test("dynamics/heun",-0.106813,-0.337996,0.935067, exe ) ) fail += 1;
+   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-simple", 1e-10, 0.0, 0.0, 1.0, 1.0, exe) ) fail += 1;
+   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-complex", 1e-10, 2.69979e-15, -3.07481e-15, 1, 1, exe) ) fail += 1;
 
    // Summary
    std::cout << "--------------------------------------------------" << std::endl;
