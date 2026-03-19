@@ -35,6 +35,8 @@ bool exchange_test(std::string dir, double result, std::string executable){
    int vmp = vt::system(executable);
    if( vmp != 0){
       std::cerr << "Error running vampire. Returning as failed test." << std::endl;
+      // Ensure tests run from the integration root directory
+      vt::chdir(path);
       return false;
    }
 

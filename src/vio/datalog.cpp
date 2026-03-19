@@ -396,8 +396,8 @@ namespace vout{
 			vmpi::TotalWaitTime=0.0;
 		}
 		#endif
-
-      // check for open ofstream on root process only
+ 
+	  // check for open ofstream on root process only
       if(vmpi::my_rank == 0){
          if(!zmag.is_open()){
             // check for checkpoint continue and append data
@@ -408,9 +408,8 @@ namespace vout{
                // write file header information
                write_output_file_header(zmag, file_output_list);
             }
-         }
-      }
-
+        }
+	}
       // Only output 1/output_rate time steps// This is all serialised inside the write_output fn - AJN
       if(sim::time%vout::output_rate==0){
          write_out(zmag,file_output_list);

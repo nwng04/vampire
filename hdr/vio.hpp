@@ -148,6 +148,7 @@ namespace vout{
     extern int fw_size;
     extern int fw_size_int;
     extern int max_header;
+    extern std::string output_file_name;
 
     extern std::string output_file_name;
 

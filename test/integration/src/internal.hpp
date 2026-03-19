@@ -32,5 +32,4 @@ namespace vt{
 // Test functions
 //------------------------------------------------------------------------------
 bool exchange_test(std::string dir, double result, std::string executable);
-bool integrator_test(const std::string dir, double rx, double ry, double rz, const std::string executable);
-bool material_atoms_test(const std::string dir, int n1, int n2, int n3, int n4, const std::string executable);
+bool integrator_test(const std::string integrator, const std::string dir, const double expected_values[], const int filerow, const std::string executable);

@@ -1,0 +1,57 @@
+#------------------------------------------
+# Integration regression for spin-lattice
+# Suzuki-Trotter decomposition
+#------------------------------------------
+create:crystal-structure=bcc
+create:periodic-boundaries-x
+create:periodic-boundaries-y
+create:periodic-boundaries-z
+
+#------------------------------------------
+# Creation attributes:
+#------------------------------------------
+dimensions:unit-cell-size = 2.87 !A
+dimensions:system-size-x = 10 !A
+dimensions:system-size-y = 10 !A
+dimensions:system-size-z = 10 !A
+
+#------------------------------------------
+# Material files:
+#------------------------------------------
+material:file = Fe.mat
+
+#------------------------------------------
+# Simulation attributes:
+#------------------------------------------
+sim:integrator-random-seed = 123456
+sim:temperature=0.0
+sim:time-steps-increment = 100
+sim:total-time-steps = 100000
+sim:time-step=1.0E-15
+sim:applied-field-strength = 1.0 !T
+
+#------------------------------------------
+# Program and integrator details
+#------------------------------------------
+sim:program = time-series
+sim:integrator = spin-lattice
+#sim:noise-type = semiquantum
+
+spin-lattice:potential-cutoff-range = 7.8 !A
+spin-lattice:fields-cutoff-range = 3.75 !A
+spin-lattice:coupling = pseudodipolar
+spin-lattice:potential = harmonic
+#spin-lattice:initial-random-displacement = 0.1
+spin-lattice:initial-thermal-velocity = 600
+exchange:interaction-range = 2
+config:sld
+
+#------------------------------------------
+# data output
+#------------------------------------------
+output:output-rate = 1
+#output:precision = 16
+output:real-time
+output:magnetisation
+screen:real-time
+screen:magnetisation
