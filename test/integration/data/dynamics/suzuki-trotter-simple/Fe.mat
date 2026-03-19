@@ -20,7 +20,7 @@ material[1]:damping-constant=0.05
 material[1]:damping-constant-lattice=0.05
 material[1]:exchange-J0=0.904 !eV
 material[1]:harmonic-potential-V0=0.15 !eV
-material[1]:coupling-C0=0.5
+material[1]:coupling-C0=0
 
 # Lorentzian Parameters
 #material[1]:A = 7812

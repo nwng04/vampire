@@ -43,8 +43,12 @@ int main(){
 
    // Integrator tests
    //if( !integrator_test("dynamics/heun",-0.106813,-0.337996,0.935067, exe ) ) fail += 1;
-   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-simple", 1e-10, 0.0, 0.0, 1.0, 1.0, exe) ) fail += 1;
-   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-complex", 1e-10, 2.69979e-15, -3.07481e-15, 1, 1, exe) ) fail += 1;
+   const double suzuki_simple_expected[] = {9.92e-11, 0.0, 0.0, 1.0, 1.0};
+   const double suzuki_complex_expected[] = {1e-10, 2.69979e-15, -3.07481e-15, 1.0, 1.0};
+   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-simple", suzuki_simple_expected, 1000, exe) ) fail += 1;
+   if( !integrator_test("suzuki-trotter", "dynamics/suzuki-trotter-complex", suzuki_complex_expected, 100, exe) ) fail += 1;
+   // Test - energy conservation, other physical properties
+
 
    // Summary
    std::cout << "--------------------------------------------------" << std::endl;

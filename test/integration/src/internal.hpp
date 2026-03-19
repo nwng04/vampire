@@ -32,4 +32,4 @@ namespace vt{
 // Test functions
 //------------------------------------------------------------------------------
 bool exchange_test(std::string dir, double result, std::string executable);
-bool integrator_test(const std::string integrator, const std::string dir, const double expected_values[], const int filerow, const std::string executable)
+bool integrator_test(const std::string integrator, const std::string dir, const double expected_values[], const int filerow, const std::string executable);
