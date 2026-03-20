@@ -48,6 +48,7 @@ namespace sld{
 
       double dr_init; // initial conditions
       double th_velo;
+      bool Use_LLGQ_Thermostat = false;
 
       double morse_beta;
       double morse_factor;

@@ -142,10 +142,18 @@ namespace sld{
       generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
       generate (Hz_th.begin(),Hz_th.end(), mtrandom::gaussian);
 
+      //vectors for thermal forces
+      std::vector <double> Fx_th(atoms::x_spin_array.size());
+      std::vector <double> Fy_th(atoms::x_spin_array.size());
+      std::vector <double> Fz_th(atoms::x_spin_array.size());
+      
+      generate (Fx_th.begin(),Fx_th.end(), mtrandom::gaussian);
+      generate (Fy_th.begin(),Fy_th.end(), mtrandom::gaussian);
+      generate (Fz_th.begin(),Fz_th.end(), mtrandom::gaussian);
+     
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
       std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
 
       /*for(int atom=0;atom<=num_atoms-1;atom++){
 
@@ -573,100 +581,101 @@ namespace sld{
       return EXIT_SUCCESS;
    }
 
-namespace internal{
+   namespace internal{
 
-void cayley_update(const int start_index,
-            const int end_index,
-            double dt,
-            std::vector<double>& x_spin_array, // coord vectors for atoms
-            std::vector<double>& y_spin_array,
-            std::vector<double>& z_spin_array,
-            std::vector<double>& fields_array_x, //  vectors for fields
-            std::vector<double>& fields_array_y,
-            std::vector<double>& fields_array_z){
+      void cayley_update(const int start_index,
+               const int end_index,
+               double dt,
+               std::vector<double>& x_spin_array, // coord vectors for atoms
+               std::vector<double>& y_spin_array,
+               std::vector<double>& z_spin_array,
+               std::vector<double>& fields_array_x, //  vectors for fields
+               std::vector<double>& fields_array_y,
+               std::vector<double>& fields_array_z){
 
-      for( int i = start_index; i<end_index; i++)
-      {
-          double Sx = x_spin_array[i];
-          double Sy = y_spin_array[i];
-          double Sz = z_spin_array[i];
+         for( int i = start_index; i<end_index; i++)
+         {
+            double Sx = x_spin_array[i];
+            double Sy = y_spin_array[i];
+            double Sz = z_spin_array[i];
 
-          double Ax = fields_array_x[i] * dt;
-          double Ay = fields_array_y[i] * dt;
-          double Az = fields_array_z[i] * dt;
+            double Ax = fields_array_x[i] * dt;
+            double Ay = fields_array_y[i] * dt;
+            double Az = fields_array_z[i] * dt;
 
-          double AS = Ax*Sx + Ay*Sy + Az*Sz;
-          double A2 = Ax * Ax + Ay* Ay + Az * Az;
+            double AS = Ax*Sx + Ay*Sy + Az*Sz;
+            double A2 = Ax * Ax + Ay* Ay + Az * Az;
 
-          double AxSx = Ay * Sz - Az * Sy;
-          double AxSy = Az * Sx - Ax * Sz;
-          double AxSz = Ax * Sy - Ay * Sx;
+            double AxSx = Ay * Sz - Az * Sy;
+            double AxSy = Az * Sx - Ax * Sz;
+            double AxSz = Ax * Sy - Ay * Sx;
 
-          double factor = 1.0 / (1.0 + 0.25 * A2);
+            double factor = 1.0 / (1.0 + 0.25 * A2);
 
-          x_spin_array[i] = (Sx * ( 1.0 - 0.25 * A2) + AxSx + 0.5 * Ax * AS) * factor;
-          y_spin_array[i] = (Sy * ( 1.0 - 0.25 * A2) + AxSy + 0.5 * Ay * AS) * factor;
-          z_spin_array[i] = (Sz * ( 1.0 - 0.25 * A2) + AxSz + 0.5 * Az * AS) * factor;
+            x_spin_array[i] = (Sx * ( 1.0 - 0.25 * A2) + AxSx + 0.5 * Ax * AS) * factor;
+            y_spin_array[i] = (Sy * ( 1.0 - 0.25 * A2) + AxSy + 0.5 * Ay * AS) * factor;
+            z_spin_array[i] = (Sz * ( 1.0 - 0.25 * A2) + AxSz + 0.5 * Az * AS) * factor;
+         }
+
+         return;
       }
 
-  return;
-}
+      void add_spin_noise(const int start_index,
+                  const int end_index,
+                  double dt,
+                  const std::vector<int>& type_array, // type for atom
+                  const std::vector<double>& x_spin_array, // coord vectors for atoms
+                  const std::vector<double>& y_spin_array,
+                  const std::vector<double>& z_spin_array,
+                  std::vector<double>& fields_array_x, //  vectors for fields
+                  std::vector<double>& fields_array_y,
+                  std::vector<double>& fields_array_z,
+                  std::vector<double>& Hx_th, //  vectors for fields
+                  std::vector<double>& Hy_th,
+                  std::vector<double>& Hz_th){
 
-void add_spin_noise(const int start_index,
-            const int end_index,
-            double dt,
-            const std::vector<int>& type_array, // type for atom
-            const std::vector<double>& x_spin_array, // coord vectors for atoms
-            const std::vector<double>& y_spin_array,
-            const std::vector<double>& z_spin_array,
-            std::vector<double>& fields_array_x, //  vectors for fields
-            std::vector<double>& fields_array_y,
-            std::vector<double>& fields_array_z,
-            std::vector<double>& Hx_th, //  vectors for fields
-            std::vector<double>& Hy_th,
-            std::vector<double>& Hz_th){
+         if (sld::internal::Use_LLGQ_Thermostat) {
+            // Quantum noise is handled by the LLGQ thermostat
+            // Spin noise is not required
+            return;
+         }
 
+         for( int i = start_index; i<end_index; i++)
+         {
+            const unsigned int imat = atoms::type_array[i];
 
-     for( int i = start_index; i<end_index; i++)
-
-    {
-        const unsigned int imat = atoms::type_array[i];
-
-        double lambda=mp::material[imat].alpha;
-        double spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
-
-
-        //if during equilibration:
-        if (sim::time < sim::equilibration_time) {
-        lambda=mp::material[imat].alpha_eq;
-        spin_noise=mp::material[imat].H_th_sigma_eq*sqrt(sim::temperature);
-        }
+            double lambda=mp::material[imat].alpha;
+            double spin_noise=mp::material[imat].H_th_sigma*sqrt(sim::temperature);
 
 
+            //if during equilibration:
+            if (sim::time < sim::equilibration_time) {
+               lambda=mp::material[imat].alpha_eq;
+               spin_noise=mp::material[imat].H_th_sigma_eq*sqrt(sim::temperature);
+            }
 
-        double Sx = x_spin_array[i];
-        double Sy = y_spin_array[i];
-        double Sz = z_spin_array[i];
+            double Sx = x_spin_array[i];
+            double Sy = y_spin_array[i];
+            double Sz = z_spin_array[i];
 
-        double Fx = fields_array_x[i] + spin_noise * Hx_th[i];
-        double Fy = fields_array_y[i] + spin_noise * Hy_th[i];
-        double Fz = fields_array_z[i] + spin_noise * Hz_th[i];
+            double Fx = fields_array_x[i] + spin_noise * Hx_th[i];
+            double Fy = fields_array_y[i] + spin_noise * Hy_th[i];
+            double Fz = fields_array_z[i] + spin_noise * Hz_th[i];
 
-        double FxSx = Fy * Sz - Fz * Sy;
-        double FxSy = Fz * Sx - Fx * Sz;
-        double FxSz = Fx * Sy - Fy * Sx;
+            double FxSx = Fy * Sz - Fz * Sy;
+            double FxSy = Fz * Sx - Fx * Sz;
+            double FxSz = Fx * Sy - Fy * Sx;
 
-        double inv_l2 = 1.0 / (1.0 + lambda*lambda);
+            double inv_l2 = 1.0 / (1.0 + lambda*lambda);
 
-        fields_array_x[i] = (Fx + lambda * FxSx) * inv_l2;
-        fields_array_y[i] = (Fy + lambda * FxSy) * inv_l2;
-        fields_array_z[i] = (Fz + lambda * FxSz) * inv_l2;
-    }
+            fields_array_x[i] = (Fx + lambda * FxSx) * inv_l2;
+            fields_array_y[i] = (Fy + lambda * FxSy) * inv_l2;
+            fields_array_z[i] = (Fz + lambda * FxSz) * inv_l2;
+         }
 
-return;
-}//end of add_spin_noise
+      return;
+      }//end of add_spin_noise
 
-
-} // end of internal namespace
+   } // end of internal namespace
 
 } // end of sld namespace
