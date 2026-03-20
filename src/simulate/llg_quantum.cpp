@@ -31,6 +31,7 @@
 #include "material.hpp"
 #include "random.hpp"
 #include "sim.hpp"
+#include "../spinlattice/internal.hpp"
 
 #include "internal.hpp"
 
@@ -512,6 +513,11 @@ namespace sim{
       double lorentzian = A * Gamma * omega / lorentzian_denom;
       double coth = (x < 1e-10) ? 1.0 / x : 1.0 / tanh(x);  // Stabilize coth calculation near zero
 
+      double lattice_factor = 1;
+      if (sld::internal::lattice_noise){
+         lattice_factor = omega * omega;
+      }
+      lorentzian *= lattice_factor;
 
       switch (sim::noise_type) {
          case 0: // Classical Noise

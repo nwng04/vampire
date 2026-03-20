@@ -121,6 +121,13 @@ namespace sld{
          return true;
      }
 
+     test="quantum-lattice-noise";
+     if(word==test){
+         bool qt = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         sld::internal::lattice_noise = qt;
+         return true;
+     }
+
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------

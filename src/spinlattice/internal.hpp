@@ -125,6 +125,7 @@ namespace sld{
       extern double dr_init;
       extern double th_velo;
       extern bool Use_LLGQ_Thermostat;
+      extern bool lattice_noise;
 
        //for the morse potential
        extern double morse_beta;
