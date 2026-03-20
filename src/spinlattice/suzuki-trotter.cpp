@@ -49,12 +49,12 @@ namespace sld{
                std::vector<double>& z_coord_array,
                std::vector<double>& forces_array_x, //  vectors for forces
                std::vector<double>& forces_array_y,
-               std::vector<double>& forces_array_z){
+               std::vector<double>& forces_array_z)
+   {
+      return;
+   }
 
-         return;
-               }
-
-     void stats_sld(){
+   void stats_sld(){
       const int num_atoms=atoms::num_atoms;
 
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
@@ -80,16 +80,11 @@ namespace sld{
                         sld::internal::fields_array_y,
                         sld::internal::fields_array_z);
 
-
-
       sld::J_eff= sld::compute_effective_J(0,atoms::num_atoms,
                   sld::internal::sumJ);
-//
+
       sld::C_eff= sld::compute_effective_C(0,atoms::num_atoms,
                   sld::internal::sumC);
-
-
-
    }
 
    int initialise_quantum_noise(){
@@ -133,7 +128,9 @@ namespace sld{
       double dt2=0.5*mp::dt_SI*1e12;
 
       // Check for initialisation of LLG integration arrays
-      if(sld::internal::initialise_noise==false) initialise_quantum_noise();
+      if(sld::internal::Use_LLGQ_Thermostat && !sld::internal::initialise_noise) {
+         initialise_quantum_noise();
+      }
 
       // NOTE: NOISE VARIABLES TO CHANGE
       //vectors for thermal noise spin plus lattice
@@ -144,7 +141,6 @@ namespace sld{
       generate (Hx_th.begin(),Hx_th.end(), mtrandom::gaussian);
       generate (Hy_th.begin(),Hy_th.end(), mtrandom::gaussian);
       generate (Hz_th.begin(),Hz_th.end(), mtrandom::gaussian);
-
 
       std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
       std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
@@ -163,64 +159,6 @@ namespace sld{
          }}*/
 
       for(int atom=0;atom<=num_atoms-1;atom++){
-
-
-
-
-      sld::compute_fields(atom, // first atom for exchange interactions to be calculated
-                        atom+1, // last +1 atom to be calculated
-                        atoms::neighbour_list_start_index,
-                        atoms::neighbour_list_end_index,
-                        atoms::type_array, // type for atom
-                        atoms::neighbour_list_array, // list of interactions between atoms
-                        atoms::x_coord_array,
-                        atoms::y_coord_array,
-                        atoms::z_coord_array,
-                        atoms::x_spin_array,
-                        atoms::y_spin_array,
-                        atoms::z_spin_array,
-                        sld::internal::forces_array_x,
-                        sld::internal::forces_array_y,
-                        sld::internal::forces_array_z,
-                        sld::internal::fields_array_x,
-                        sld::internal::fields_array_y,
-                        sld::internal::fields_array_z);
-
-      sld::internal::add_spin_noise(atom,
-                  atom+1,
-                  mp::dt_SI*1e12,
-                  atoms::type_array, // type for atom
-                  atoms::x_spin_array,
-                  atoms::y_spin_array,
-                  atoms::z_spin_array,
-                  sld::internal::fields_array_x,
-                  sld::internal::fields_array_y,
-                  sld::internal::fields_array_z,
-                  Hx_th, //  vectors for fields
-                  Hy_th,
-                  Hz_th);
-
-
-      sld::internal::cayley_update(atom,
-                  atom+1,
-                  cay_dt,
-                  atoms::x_spin_array,
-                  atoms::y_spin_array,
-                  atoms::z_spin_array,
-                  sld::internal::fields_array_x,
-                  sld::internal::fields_array_y,
-                  sld::internal::fields_array_z);
-
-      }
-
-
-      std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
-      std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
-      std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
-      for(int atom=num_atoms-1;atom>=0;atom--){
-
-
          sld::compute_fields(atom, // first atom for exchange interactions to be calculated
                            atom+1, // last +1 atom to be calculated
                            atoms::neighbour_list_start_index,
@@ -240,6 +178,55 @@ namespace sld{
                            sld::internal::fields_array_y,
                            sld::internal::fields_array_z);
 
+         sld::internal::add_spin_noise(atom,
+                     atom+1,
+                     mp::dt_SI*1e12,
+                     atoms::type_array, // type for atom
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z,
+                     Hx_th, //  vectors for fields
+                     Hy_th,
+                     Hz_th);
+
+
+         sld::internal::cayley_update(atom,
+                     atom+1,
+                     cay_dt,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z);
+      }
+
+      std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+      std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
+      std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
+
+      for(int atom=num_atoms-1;atom>=0;atom--){
+         sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                           atom+1, // last +1 atom to be calculated
+                           atoms::neighbour_list_start_index,
+                           atoms::neighbour_list_end_index,
+                           atoms::type_array, // type for atom
+                           atoms::neighbour_list_array, // list of interactions between atoms
+                           atoms::x_coord_array,
+                           atoms::y_coord_array,
+                           atoms::z_coord_array,
+                           atoms::x_spin_array,
+                           atoms::y_spin_array,
+                           atoms::z_spin_array,
+                           sld::internal::forces_array_x,
+                           sld::internal::forces_array_y,
+                           sld::internal::forces_array_z,
+                           sld::internal::fields_array_x,
+                           sld::internal::fields_array_y,
+                           sld::internal::fields_array_z);
 
          sld::internal::add_spin_noise(atom,
                      atom+1,
@@ -264,18 +251,12 @@ namespace sld{
                      sld::internal::fields_array_x,
                      sld::internal::fields_array_y,
                      sld::internal::fields_array_z);
-
       }
-
-
-
 
       //forces are set to 0 for computation
       std::fill(sld::internal::forces_array_x.begin(), sld::internal::forces_array_x.end(), 0.0);
       std::fill(sld::internal::forces_array_y.begin(), sld::internal::forces_array_y.end(), 0.0);
       std::fill(sld::internal::forces_array_z.begin(), sld::internal::forces_array_z.end(), 0.0);
-
-
 
       sld::compute_fields(0, // first atom for exchange interactions to be calculated
                         num_atoms, // last +1 atom to be calculated
@@ -317,38 +298,51 @@ namespace sld{
      //update position, Velocity
       for(int atom=0;atom<num_atoms;atom++){
 
-      const unsigned int imat = atoms::type_array[atom];
-      double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
-      double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
-      //double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
-      double quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
+         const unsigned int imat = atoms::type_array[atom];
+         double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
+         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
 
-       //if during equilibration:
-       if (sim::time < sim::equilibration_time) {
-              f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
-              //velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
-       }
+         double velo_noise, quantum_noise;
+      
+         if (!sld::internal::Use_LLGQ_Thermostat) {
+            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+            //if during equilibration:
+            if (sim::time < sim::equilibration_time) {
+                  f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
+                  velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
+            }
+            
+            atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
+            atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+            atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+         }
 
-             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
-             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
-             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
+         else if (sld::internal::Use_LLGQ_Thermostat){
+            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
+         
+            atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
+            atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
+            atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
+         }
 
-             atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::x_velo_array[atom];
-             atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::y_velo_array[atom];
-             atoms::z_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::z_velo_array[atom];
+         else{
+            std::cerr << "Error: Invalid setting for Use_LLGQ_Thermostat. Must be 0 (classical noise) or 1 (quantum noise)." << std::endl;
+            std::exit(EXIT_FAILURE);
+         }
 
-       }
+         atoms::x_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::x_velo_array[atom];
+         atoms::y_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::y_velo_array[atom];
+         atoms::z_coord_array[atom] +=  mp::dt_SI*1e12 * atoms::z_velo_array[atom];
+
+      }
+
+      //reset forces to 0 for v integration
+      std::fill(sld::internal::forces_array_x.begin(), sld::internal::forces_array_x.end(), 0.0);
+      std::fill(sld::internal::forces_array_y.begin(), sld::internal::forces_array_y.end(), 0.0);
+      std::fill(sld::internal::forces_array_z.begin(), sld::internal::forces_array_z.end(), 0.0);
 
 
-
-
-       //reset forces to 0 for v integration
-        std::fill(sld::internal::forces_array_x.begin(), sld::internal::forces_array_x.end(), 0.0);
-        std::fill(sld::internal::forces_array_y.begin(), sld::internal::forces_array_y.end(), 0.0);
-        std::fill(sld::internal::forces_array_z.begin(), sld::internal::forces_array_z.end(), 0.0);
-
-
-       sld::compute_fields(0, // first atom for exchange interactions to be calculated
+      sld::compute_fields(0, // first atom for exchange interactions to be calculated
                           num_atoms, // last +1 atom to be calculated
                           atoms::neighbour_list_start_index,
                           atoms::neighbour_list_end_index,
@@ -367,8 +361,7 @@ namespace sld{
                           sld::internal::fields_array_y,
                           sld::internal::fields_array_z);
 
-
-        sld::compute_forces(0, // first atom for exchange interactions to be calculated
+      sld::compute_forces(0, // first atom for exchange interactions to be calculated
                           num_atoms, // last +1 atom to be calculated
                           atoms::neighbour_list_start_index,
                           atoms::neighbour_list_end_index,
@@ -385,90 +378,48 @@ namespace sld{
                           sld::internal::forces_array_z,
                           sld::internal::potential_eng);
 
-
       for(int atom=0;atom<num_atoms;atom++){
 
-        const unsigned int imat = atoms::type_array[atom];
-        double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
-        double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
-        //double velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
-        double quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
+         const unsigned int imat = atoms::type_array[atom];
+         double dt2_m=0.5*mp::dt_SI*1e12/sld::internal::mp[imat].mass.get();
+         double f_eta=1.0-0.5*sld::internal::mp[imat].damp_lat.get()*mp::dt_SI*1e12;
 
+         double velo_noise, quantum_noise;
+      
+         if (!sld::internal::Use_LLGQ_Thermostat) {
+            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+            //if during equilibration:
+            if (sim::time < sim::equilibration_time) {
+                  f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
+                  velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
+            }
+            
+            atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
+            atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
+            atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
+         }
 
-          //if during equilibration:
-          if (sim::time < sim::equilibration_time) {
-                f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
-                //velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
-          }
-
-         atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
-         atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*quantum_noise;
-         atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
-         //atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
-         //atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom] + dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
-
+         else if (sld::internal::Use_LLGQ_Thermostat){
+            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
+         
+            atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
+            atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
+            atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
+         }
+         
+         else{
+            std::cerr << "Error: Invalid setting for Use_LLGQ_Thermostat. Must be 0 (classical noise) or 1 (quantum noise)." << std::endl;
+            std::exit(EXIT_FAILURE);
+         }
       }
 
 
-  std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
-  std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
-  std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
+      std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+      std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
+      std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
 
 
-   for(int atom=0;atom<=num_atoms-1;atom++){
-
-
-   sld::compute_fields(atom, // first atom for exchange interactions to be calculated
-                     atom+1, // last +1 atom to be calculated
-                     atoms::neighbour_list_start_index,
-                     atoms::neighbour_list_end_index,
-                     atoms::type_array, // type for atom
-                     atoms::neighbour_list_array, // list of interactions between atoms
-                     atoms::x_coord_array,
-                     atoms::y_coord_array,
-                     atoms::z_coord_array,
-                     atoms::x_spin_array,
-                     atoms::y_spin_array,
-                     atoms::z_spin_array,
-                     sld::internal::forces_array_x,
-                     sld::internal::forces_array_y,
-                     sld::internal::forces_array_z,
-                     sld::internal::fields_array_x,
-                     sld::internal::fields_array_y,
-                     sld::internal::fields_array_z);
-
-   sld::internal::add_spin_noise(atom,
-               atom+1,
-               mp::dt_SI*1e12,
-               atoms::type_array, // type for atom
-               atoms::x_spin_array,
-               atoms::y_spin_array,
-               atoms::z_spin_array,
-               sld::internal::fields_array_x,
-               sld::internal::fields_array_y,
-               sld::internal::fields_array_z,
-               Hx_th, //  vectors for fields
-               Hy_th,
-               Hz_th);
-
-   sld::internal::cayley_update(atom,
-               atom+1,
-               cay_dt,
-               atoms::x_spin_array,
-               atoms::y_spin_array,
-               atoms::z_spin_array,
-               sld::internal::fields_array_x,
-               sld::internal::fields_array_y,
-               sld::internal::fields_array_z);
-
-
-   }
-
-   std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
-   std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
-   std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
-
-   for(int atom=num_atoms-1;atom>=0;atom--){
+      for(int atom=0;atom<=num_atoms-1;atom++){
 
       sld::compute_fields(atom, // first atom for exchange interactions to be calculated
                         atom+1, // last +1 atom to be calculated
@@ -490,30 +441,81 @@ namespace sld{
                         sld::internal::fields_array_z);
 
       sld::internal::add_spin_noise(atom,
-                  atom+1,
-                  mp::dt_SI*1e12,
-                  atoms::type_array, // type for atom
-                  atoms::x_spin_array,
-                  atoms::y_spin_array,
-                  atoms::z_spin_array,
-                  sld::internal::fields_array_x,
-                  sld::internal::fields_array_y,
-                  sld::internal::fields_array_z,
-                  Hx_th, //  vectors for fields
-                  Hy_th,
-                  Hz_th);
+                        atom+1,
+                        mp::dt_SI*1e12,
+                        atoms::type_array, // type for atom
+                        atoms::x_spin_array,
+                        atoms::y_spin_array,
+                        atoms::z_spin_array,
+                        sld::internal::fields_array_x,
+                        sld::internal::fields_array_y,
+                        sld::internal::fields_array_z,
+                        Hx_th, //  vectors for fields
+                        Hy_th,
+                        Hz_th);
 
       sld::internal::cayley_update(atom,
-                  atom+1,
-                  cay_dt,
-                  atoms::x_spin_array,
-                  atoms::y_spin_array,
-                  atoms::z_spin_array,
-                  sld::internal::fields_array_x,
-                  sld::internal::fields_array_y,
-                  sld::internal::fields_array_z);
+                        atom+1,
+                        cay_dt,
+                        atoms::x_spin_array,
+                        atoms::y_spin_array,
+                        atoms::z_spin_array,
+                        sld::internal::fields_array_x,
+                        sld::internal::fields_array_y,
+                        sld::internal::fields_array_z);
 
-   }
+      }
+
+      std::fill(sld::internal::fields_array_x.begin(), sld::internal::fields_array_x.end(), 0.0);
+      std::fill(sld::internal::fields_array_y.begin(), sld::internal::fields_array_y.end(), 0.0);
+      std::fill(sld::internal::fields_array_z.begin(), sld::internal::fields_array_z.end(), 0.0);
+
+      for(int atom=num_atoms-1;atom>=0;atom--){
+
+         sld::compute_fields(atom, // first atom for exchange interactions to be calculated
+                           atom+1, // last +1 atom to be calculated
+                           atoms::neighbour_list_start_index,
+                           atoms::neighbour_list_end_index,
+                           atoms::type_array, // type for atom
+                           atoms::neighbour_list_array, // list of interactions between atoms
+                           atoms::x_coord_array,
+                           atoms::y_coord_array,
+                           atoms::z_coord_array,
+                           atoms::x_spin_array,
+                           atoms::y_spin_array,
+                           atoms::z_spin_array,
+                           sld::internal::forces_array_x,
+                           sld::internal::forces_array_y,
+                           sld::internal::forces_array_z,
+                           sld::internal::fields_array_x,
+                           sld::internal::fields_array_y,
+                           sld::internal::fields_array_z);
+
+         sld::internal::add_spin_noise(atom,
+                     atom+1,
+                     mp::dt_SI*1e12,
+                     atoms::type_array, // type for atom
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z,
+                     Hx_th, //  vectors for fields
+                     Hy_th,
+                     Hz_th);
+
+         sld::internal::cayley_update(atom,
+                     atom+1,
+                     cay_dt,
+                     atoms::x_spin_array,
+                     atoms::y_spin_array,
+                     atoms::z_spin_array,
+                     sld::internal::fields_array_x,
+                     sld::internal::fields_array_y,
+                     sld::internal::fields_array_z);
+
+      }
 
     /*
 
@@ -568,9 +570,8 @@ namespace sld{
 
                      }}*/
 
-
       return EXIT_SUCCESS;
-  }
+   }
 
 namespace internal{
 

@@ -114,6 +114,13 @@ namespace sld{
          return true;
      }
 
+     test="quantum-thermostat";
+     if(word==test){
+         bool qt = vin::check_for_valid_bool(value, word, line, prefix, "input");
+         sld::internal::Use_LLGQ_Thermostat = qt;
+         return true;
+     }
+
       //--------------------------------------------------------------------
       // Keyword not found
       //--------------------------------------------------------------------
@@ -177,35 +184,6 @@ namespace sld{
          sld::internal::mp[super_index].C0.set(c0);
          return true;
       }
-
-      //------------------------------------------------------------
-      test="A"; // what is this value for?
-      if(word==test){
-          sim::internal::mp[super_index].A.set(std::stod(value)); // need to error check these
-          //std::cout << "Assigned A: " << read_material[super_index].A << std::endl; // Debug output
-          return true;
-      }
-      //------------------------------------------------------------
-      test="Gamma";
-      if(word==test){
-          sim::internal::mp[super_index].Gamma.set(std::stod(value));
-          return true;
-      }
-      //------------------------------------------------------------
-      test="omega0";
-      if(word==test){
-          sim::internal::mp[super_index].omega0.set(std::stod(value));
-          //std::cout << "Assigned omega0: " << read_material[super_index].omega0 << std::endl; // Debug output
-          return true;
-      }
-      //------------------------------------------------------------
-      test="S0";
-      if(word==test){
-          sim::internal::mp[super_index].S0.set(std::stod(value));
-          //std::cout << "Assigned S0: " << read_material[super_index].S0 << std::endl; // Debug output
-          return true;
-      }
-
 
       //--------------------------------------------------------------------
       // Keyword not found
