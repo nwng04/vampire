@@ -129,10 +129,10 @@ namespace sld{
 
       // Check for initialisation of LLG integration arrays
       if(sld::internal::Use_LLGQ_Thermostat && !sld::internal::initialise_noise) {
+         std::cout << "'Use_LLGQ_Thermostat' enabled, initialising quantum noise..." << std::endl;
          initialise_quantum_noise();
       }
 
-      // NOTE: NOISE VARIABLES TO CHANGE
       //vectors for thermal noise spin plus lattice
       std::vector <double> Hx_th(atoms::x_spin_array.size());
    	std::vector <double> Hy_th(atoms::x_spin_array.size());
@@ -313,6 +313,7 @@ namespace sld{
          double velo_noise, quantum_noise;
       
          if (!sld::internal::Use_LLGQ_Thermostat) {
+            std::cout << "Classical Noise used for lattice." << std::endl;
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -326,6 +327,8 @@ namespace sld{
          }
 
          else if (sld::internal::Use_LLGQ_Thermostat){
+            std::cout << "LLGQ used to generate noise for lattice." << std::endl;
+
             quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
          
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
@@ -637,8 +640,10 @@ namespace sld{
          if (sld::internal::Use_LLGQ_Thermostat) {
             // Quantum noise is handled by the LLGQ thermostat
             // Spin noise is not required
+            std::cout << "Spin noise generation omitted." << std::endl;
             return;
          }
+         std::cout << "Adding classical spin noise." << std::endl;
 
          for( int i = start_index; i<end_index; i++)
          {
