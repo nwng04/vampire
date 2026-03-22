@@ -124,7 +124,7 @@ namespace sld{
 
       extern double dr_init;
       extern double th_velo;
-      extern bool Use_LLGQ_Thermostat;
+      extern bool use_llgq_thermostat;
       extern bool lattice_noise;
 
        //for the morse potential
@@ -328,7 +328,12 @@ namespace sld{
       extern std::vector<double> atom_idx_y;
       extern std::vector<double> atom_idx_z;
 
-      extern bool initialise_noise; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+      extern bool initialise_noise; // Flag to define state of LLG arrays (initialised/uninitialised)
+      
+      // Debug parameters for printing to console
+      extern bool classical_noise_first_call;
+      extern bool llgq_noise_first_call;
+      extern bool spin_noise_generation_first_call;
 
       //-------------------------------------------------------------------------
       // Internal function declarations

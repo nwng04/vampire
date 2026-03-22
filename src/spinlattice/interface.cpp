@@ -117,7 +117,7 @@ namespace sld{
      test="quantum-thermostat";
      if(word==test){
          bool qt = vin::check_for_valid_bool(value, word, line, prefix, "input");
-         sld::internal::Use_LLGQ_Thermostat = qt;
+         sld::internal::use_llgq_thermostat = qt;
          return true;
      }
 

@@ -128,7 +128,7 @@ namespace sld{
       double dt2=0.5*mp::dt_SI*1e12;
 
       // Check for initialisation of LLG integration arrays
-      if(sld::internal::Use_LLGQ_Thermostat && !sld::internal::initialise_noise) {
+      if(sld::internal::use_llgq_thermostat && !sld::internal::initialise_noise) {
          std::cout << "'Use_LLGQ_Thermostat' enabled, initialising quantum noise..." << std::endl;
          initialise_quantum_noise();
       }
@@ -312,8 +312,12 @@ namespace sld{
 
          double velo_noise, quantum_noise;
       
-         if (!sld::internal::Use_LLGQ_Thermostat) {
-            std::cout << "Classical Noise used for lattice." << std::endl;
+         if (!sld::internal::use_llgq_thermostat) {
+            if (sld::internal::classical_noise_first_call){
+               std::cout << "Classical Noise used for lattice." << std::endl;
+               sld::internal::classical_noise_first_call = false;
+            }
+
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -326,8 +330,11 @@ namespace sld{
             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
          }
 
-         else if (sld::internal::Use_LLGQ_Thermostat){
-            std::cout << "LLGQ used to generate noise for lattice." << std::endl;
+         else if (sld::internal::use_llgq_thermostat){
+            if (sld::internal::llgq_noise_first_call){
+               std::cout << "LLGQ used to generate noise for lattice." << std::endl;
+               sld::internal::llgq_noise_first_call = false;
+            }
 
             quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
          
@@ -337,7 +344,7 @@ namespace sld{
          }
 
          else{
-            std::cerr << "Error: Invalid setting for Use_LLGQ_Thermostat. Must be 0 (classical noise) or 1 (quantum noise)." << std::endl;
+            std::cerr << "Error: Invalid setting for use_llgq_thermostat. Must be 0 (classical noise) or 1 (quantum noise)." << std::endl;
             std::exit(EXIT_FAILURE);
          }
 
@@ -397,7 +404,7 @@ namespace sld{
 
          double velo_noise, quantum_noise;
       
-         if (!sld::internal::Use_LLGQ_Thermostat) {
+         if (!sld::internal::use_llgq_thermostat) {
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -410,7 +417,7 @@ namespace sld{
             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*velo_noise*Fz_th[atom];
          }
 
-         else if (sld::internal::Use_LLGQ_Thermostat){
+         else if (sld::internal::use_llgq_thermostat){
             quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
          
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
@@ -637,13 +644,20 @@ namespace sld{
                   std::vector<double>& Hy_th,
                   std::vector<double>& Hz_th){
 
-         if (sld::internal::Use_LLGQ_Thermostat) {
+         if (sld::internal::use_llgq_thermostat) {
             // Quantum noise is handled by the LLGQ thermostat
             // Spin noise is not required
-            std::cout << "Spin noise generation omitted." << std::endl;
+            if (sld::internal::spin_noise_generation_first_call) {
+               std::cout << "LLGQ Thermostat enabled, skipping classical spin noise generation." << std::endl;
+               sld::internal::spin_noise_generation_first_call = false;
+            }
             return;
          }
-         std::cout << "Adding classical spin noise." << std::endl;
+
+         if (sld::internal::spin_noise_generation_first_call) {
+            std::cout << "Adding classical spin noise." << std::endl;
+            sld::internal::spin_noise_generation_first_call = false;
+         }
 
          for( int i = start_index; i<end_index; i++)
          {

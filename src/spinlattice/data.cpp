@@ -48,8 +48,6 @@ namespace sld{
 
       double dr_init; // initial conditions
       double th_velo;
-      bool Use_LLGQ_Thermostat = false;
-      bool lattice_noise = false;
 
       double morse_beta;
       double morse_factor;
@@ -105,7 +103,16 @@ namespace sld{
       std::vector <int> all_atoms_octant_end_index;
       std::vector <int> all_atoms_octant;
       
-      bool initialise_noise = false; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+      bool initialise_noise = false; // Flag to define state of LLG arrays (initialised/uninitialised)
+
+      // Flags set in input file to enable llgq thermostat lattice noise generation
+      bool use_llgq_thermostat = false;
+      bool lattice_noise = false;
+
+      // Flags to print debug messages to console for first call of each function
+      bool classical_noise_first_call = true;
+      bool llgq_noise_first_call = true;
+      bool spin_noise_generation_first_call = true;
 
    } // end of internal namespace
 
