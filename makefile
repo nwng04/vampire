@@ -11,12 +11,16 @@
 #LIBS=
 #FFTW=
 
+# Uncomment these to add FFTW for spin waves, quantum thermostat and FFT dipole
 LIBS= -lm -lfftw3 -L/opt/local/lib/
 FFTW= -DFFT -I/opt/local/include/
-# Uncomment these to add FFTW for spin waves, quantum thermostat and FFT dipole
 
 # Add the CUDA libraries
 CUDALIBS=-L/usr/local/cuda/lib64/ -lcuda -lcudart
+
+#DEBUG = 
+# Uncomment to turn on debug logs outputting to terminal
+DEBUG = -DDEBUG
 
 #----------------------------------------------------------------------
 # Compilers
@@ -46,8 +50,8 @@ export LC_ALL=C
 ICC_DBCFLAGS= -O0 -C -I./hdr -I./src/qvoronoi
 ICC_DBLFLAGS= -C -I./hdr -I./src/qvoronoi
 
-GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
-GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+GCC_DBCFLAGS= -g -pg -fprofile-arcs -ftest-coverage -Wall -Wextra -O0 -fbounds-check -pedantic -std=c++0x -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -Wsign-compare
+GCC_DBLFLAGS= -g -pg -fprofile-arcs -ftest-coverage -lstdc++ -std=c++0x -fbounds-check -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -Wsign-compare
 
 PCC_DBCFLAGS= -O0 -I./hdr -I./src/qvoronoi
 PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
@@ -55,8 +59,8 @@ PCC_DBLFLAGS= -O0 -I./hdr -I./src/qvoronoi
 IBM_DBCFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 IBM_DBLFLAGS= -O0 -Wall -pedantic -Wextra -I./hdr -I./src/qvoronoi
 
-LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
-LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+LLVM_DBCFLAGS= -Wall -Wextra -O0 -pedantic -std=c++11 -Wno-long-long -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -Wsign-compare
+LLVM_DBLFLAGS= -Wall -Wextra -O0 -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -Wsign-compare
 
 # Performance Flags
 ICC_CFLAGS= -O3 -axCORE-AVX2 -fno-alias -align -falign-functions -I./hdr -I./src/qvoronoi
@@ -64,11 +68,11 @@ ICC_LDFLAGS= -I./hdr -I./src/qvoronoi -axCORE-AVX2
 #ICC_CFLAGS= -O3 -xT -ipo -static -fno-alias -align -falign-functions -vec-report -I./hdr
 #ICC_LDFLAGS= -lstdc++ -ipo -I./hdr -xT -vec-report
 
-LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW)
-LLVM_LDFLAGS= -I./hdr -I./src/qvoronoi $(FFTW)
+LLVM_CFLAGS= -Wall -pedantic -O3 -mtune=native -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG)
+LLVM_LDFLAGS= -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG)
 
-GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW) -std=c++11 -Wsign-compare
-GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) -Wsign-compare
+GCC_CFLAGS=-O3 -mtune=native -funroll-all-loops -fexpensive-optimizations -funroll-loops -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -std=c++11 -Wsign-compare
+GCC_LDFLAGS= -lstdc++ -I./hdr -I./src/qvoronoi $(FFTW) $(DEBUG) -Wsign-compare
 
 PCC_CFLAGS=-O2 -march=barcelona -ipa -I./hdr -I./src/qvoronoi
 PCC_LDFLAGS= -I./hdr -I./src/qvoronoi -O2 -march=barcelona -ipa

@@ -331,6 +331,9 @@ namespace sld{
       extern bool initialise_noise; // Flag to define state of LLG arrays (initialised/uninitialised)
       
       // Debug parameters for printing to console
+      extern bool debug_banner_printed;
+      extern bool first_suzuki_trotter_call;
+
       extern bool classical_noise_first_call;
       extern bool llgq_noise_first_call;
       extern bool spin_noise_generation_first_call;
