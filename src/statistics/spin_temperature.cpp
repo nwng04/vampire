@@ -118,7 +118,7 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
 
-   const int64_t num_atoms = sx.size();
+   //const int64_t num_atoms = sx.size();
    //double SxH2=0.0;
    //double SH=0.0;
 
