@@ -175,6 +175,7 @@ namespace sld{
    void suzuki_trotter_parallel_init(std::vector<double> &x, std::vector<double> &y, std::vector<double> &z,
                          double min_dim[3], double max_dim[3]);
    extern bool suzuki_trotter_parallel_initialized;
+   int initialise_quantum_noise_parallel();
    void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array, std::vector<double> &y_spin_array, std::vector<double> &z_spin_array, std::vector<int> &type_array);
 
 

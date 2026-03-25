@@ -111,14 +111,12 @@ namespace sld{
       bool lattice_noise = false;
 
       // Flags defined to print debug messages to console for first call of each function if DEBUG flag is switched on
-#ifdef DEBUG
       bool debug_banner_printed = false;
       bool first_suzuki_trotter_call = true;
 
       bool classical_noise_first_call = true;
       bool llgq_noise_first_call = true;
       bool spin_noise_generation_first_call = true;
-#endif
    } // end of internal namespace
 
 } // end of sld namespace

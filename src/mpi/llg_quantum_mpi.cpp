@@ -75,7 +75,7 @@ namespace sim{
       // Set number of realizations (full field, for final release allow even smaller number of realizations)
       const int num_atoms = atoms::num_atoms;
       int realizations = num_atoms * 3 + 4;
-      LLGQ_arrays::noise_index = 0;
+      noise_index = 0;
 
       // Disable external thermal field calculations
       sim::hamiltonian_simulation_flags[3] = 0;
@@ -505,7 +505,7 @@ namespace sim{
         vmpi::barrier();
 
         // Increment noise index
-        LLGQ_arrays::noise_index += 1;
+        noise_index += 1;
 
         // Swap timers wait -> compute
         vmpi::TotalWaitTime+=vmpi::SwapTimer(vmpi::WaitTime, vmpi::ComputeTime);

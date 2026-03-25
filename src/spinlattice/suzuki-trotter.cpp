@@ -324,13 +324,13 @@ namespace sld{
          if (!sld::internal::use_llgq_thermostat) {
             
 #ifdef DEBUG
-         if (sld::internal::classical_noise_first_call) {
-            std::cout << "Adding lattice noise using classical noise." << std::endl;
-            sld::internal::classical_noise_first_call = false;
-         }
-         if (sld::internal::first_suzuki_trotter_call) {
-            std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-         }
+            if (sld::internal::classical_noise_first_call) {
+               std::cout << "Adding lattice noise using classical noise." << std::endl;
+               sld::internal::classical_noise_first_call = false;
+            }
+            if (sld::internal::first_suzuki_trotter_call) {
+               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
+            }
 #endif
 
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
