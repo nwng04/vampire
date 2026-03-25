@@ -556,16 +556,18 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          double velo_noise, quantum_noise;
 
          if (!sld::internal::use_llgq_thermostat) {
+            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+
 #ifdef DEBUG
             if (sld::internal::classical_noise_first_call) {
                std::cout << "Adding lattice noise using classical noise." << std::endl;
                sld::internal::classical_noise_first_call = false;
             }
             if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
+               std::cout << "Noise for atom " << atom << ": " << velo_noise << std::endl;
             }
 #endif
-            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
                   f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
@@ -656,17 +658,6 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          double velo_noise, quantum_noise;
 
          if (!sld::internal::use_llgq_thermostat) {
-
-#ifdef DEBUG
-            if (sld::internal::classical_noise_first_call) {
-               std::cout << "Adding lattice noise using classical noise." << std::endl;
-               sld::internal::classical_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
-
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -681,18 +672,7 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          }
 
          else if (sld::internal::use_llgq_thermostat){
-            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
-
-#ifdef DEBUG
-            if (sld::internal::llgq_noise_first_call) {
-               std::cout << "Adding lattice noise using LLGQ thermostat (quantum noise)." << std::endl;
-               sld::internal::llgq_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
-         
+            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);  
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
@@ -773,15 +753,6 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          double velo_noise, quantum_noise;
 
          if (!sld::internal::use_llgq_thermostat) {
-#ifdef DEBUG
-            if (sld::internal::classical_noise_first_call) {
-               std::cout << "Adding lattice noise using classical noise." << std::endl;
-               sld::internal::classical_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -796,18 +767,7 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          }
 
          else if (sld::internal::use_llgq_thermostat){
-            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
-
-#ifdef DEBUG
-            if (sld::internal::llgq_noise_first_call) {
-               std::cout << "Adding lattice noise using LLGQ thermostat (quantum noise)." << std::endl;
-               sld::internal::llgq_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
-         
+            quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);      
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;
@@ -871,15 +831,6 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
          double velo_noise, quantum_noise;
 
          if (!sld::internal::use_llgq_thermostat) {
-#ifdef DEBUG
-            if (sld::internal::classical_noise_first_call) {
-               std::cout << "Adding lattice noise using classical noise." << std::endl;
-               sld::internal::classical_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
@@ -895,17 +846,6 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
          else if (sld::internal::use_llgq_thermostat){
             quantum_noise = sim::get_noise(sim::coarse_noise_field, sim::noise_index + 1.0, sim::M_decimation, sim::atom_idx_z[atom]);
-
-#ifdef DEBUG
-            if (sld::internal::llgq_noise_first_call) {
-               std::cout << "Adding lattice noise using LLGQ thermostat (quantum noise)." << std::endl;
-               sld::internal::llgq_noise_first_call = false;
-            }
-            if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
-            }
-#endif
-         
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom]+ dt2_m * sld::internal::forces_array_x[atom]+dt2*quantum_noise;
             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom]+ dt2_m *  sld::internal::forces_array_y[atom]+dt2*quantum_noise;
             atoms::z_velo_array[atom] =  f_eta*atoms::z_velo_array[atom]+ dt2_m * sld::internal::forces_array_z[atom]+dt2*quantum_noise;

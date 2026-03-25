@@ -322,6 +322,7 @@ namespace sld{
          double velo_noise, quantum_noise;
       
          if (!sld::internal::use_llgq_thermostat) {
+            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             
 #ifdef DEBUG
             if (sld::internal::classical_noise_first_call) {
@@ -329,11 +330,10 @@ namespace sld{
                sld::internal::classical_noise_first_call = false;
             }
             if (sld::internal::first_suzuki_trotter_call) {
-               std::cout << "Noise for atom " << atom << ": " << quantum_noise << std::endl;
+               std::cout << "Noise for atom " << atom << ": " << velo_noise << std::endl;
             }
 #endif
 
-            velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
             //if during equilibration:
             if (sim::time < sim::equilibration_time) {
                   f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
