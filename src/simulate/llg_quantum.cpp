@@ -515,7 +515,7 @@ namespace sim{
 
       double lattice_factor = 1;
       if (sld::internal::lattice_noise){
-         lattice_factor = omega * omega;
+         lattice_factor = std::pow(omega, 1.5);
       }
       lorentzian *= lattice_factor;
 
