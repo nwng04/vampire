@@ -118,7 +118,7 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 
    std::fill(spin_temp.begin(),spin_temp.end(),0.0);
 
-   //const int64_t num_atoms = sx.size();
+   const int64_t num_atoms = sx.size();
    //double SxH2=0.0;
    //double SH=0.0;
 
@@ -155,7 +155,8 @@ void spin_temp_statistic_t::calculate_spin_temp(const std::vector<double>& sx, /
 
 
    // calculate contributions of spins to each magetization category
-   for(int atom=0; atom < num_atoms; ++atom){
+   const int num_masked_atoms = mask.size();
+   for(int atom=0; atom < num_masked_atoms; ++atom){
 
       const int mask_id = mask[atom]; // get mask id
 
