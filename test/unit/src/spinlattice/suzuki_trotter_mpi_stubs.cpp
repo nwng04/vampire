@@ -22,14 +22,13 @@
 
 namespace sld{
    
-   void suzuki_trotter_parallel_init(std::vector<double> &x,
-                      std::vector<double> &y,
-                      std::vector<double> &z,
-                      double min_dim[3],
-                      double max_dim[3]){
+    void suzuki_trotter_parallel_init(std::vector<double> &x,
+                        std::vector<double> &y,
+                        std::vector<double> &z,
+                        double min_dim[3],
+                        double max_dim[3]){
 
-        // Initialises 8 octants
-
+        // Initialises 8 octants if required
         if(sld::internal::c_octants.empty()){
             sld::internal::c_octants.resize(8);
             sld::internal::b_octants.resize(8);
