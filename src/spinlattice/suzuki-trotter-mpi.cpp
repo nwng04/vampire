@@ -557,6 +557,11 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
 
          if (!sld::internal::use_llgq_thermostat) {
             velo_noise=sld::internal::mp[imat].F_th_sigma.get()*sqrt(sim::temperature);
+            //if during equilibration:
+            if (sim::time < sim::equilibration_time) {
+                  f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
+                  velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
+            }
 
 #ifdef DEBUG
             if (sld::internal::classical_noise_first_call) {
@@ -567,12 +572,6 @@ void suzuki_trotter_step_parallel(std::vector<double> &x_spin_array,
                std::cout << "Noise for atom " << atom << ": " << velo_noise << std::endl;
             }
 #endif
-
-            //if during equilibration:
-            if (sim::time < sim::equilibration_time) {
-                  f_eta=1.0-0.5*sld::internal::mp[imat].eq_damp_lat.get()*mp::dt_SI*1e12;
-                  velo_noise=sld::internal::mp[imat].F_th_sigma_eq.get()*sqrt(sim::temperature);
-            }
 
             atoms::x_velo_array[atom] =  f_eta*atoms::x_velo_array[atom] + dt2_m * sld::internal::forces_array_x[atom]+dt2*velo_noise*Fx_th[atom];
             atoms::y_velo_array[atom] =  f_eta*atoms::y_velo_array[atom] + dt2_m * sld::internal::forces_array_y[atom]+dt2*velo_noise*Fy_th[atom];
