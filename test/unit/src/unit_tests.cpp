@@ -12,9 +12,27 @@
 
 // C++ standard library headers
 #include <iostream>
+#include <string>
 
-// include header for test functions
 #include "unit_tests.hpp"
+
+namespace ut{
+
+int bool_error(const bool value, const bool expected_value, const std::string& name){
+   if(value == expected_value) return 0;
+
+   std::cout << "FAIL: " << name << " expected " << expected_value << " but got " << value << std::endl;
+   return 1;
+}
+
+int string_error(const std::string& string, const std::string& phrase_to_find, const std::string& name){
+   if(string.find(phrase_to_find) != std::string::npos) return 0;
+
+   std::cout << "FAIL: " << name << " expected output containing: " << phrase_to_find << std::endl;
+   return 1;
+}
+
+}
 
 int main(int argc, char* argv[]){
 
@@ -43,6 +61,7 @@ int main(int argc, char* argv[]){
 
    if( module.utility || all ) error_count += ut::utility_tests(verbose);
    if( module.spinlattice || all ) error_count += ut::spinlattice_tests(verbose);
+   //if( module.spinlattice || all ) error_count += ut::spinlattice_mpi_tests(verbose);
    if( module.sld_interface || all ) error_count += ut::sld_interface_tests(verbose);
 
 

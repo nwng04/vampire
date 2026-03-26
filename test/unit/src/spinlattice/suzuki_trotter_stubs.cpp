@@ -7,13 +7,14 @@
 //
 //   Email: richard.evans@york.ac.uk
 //
+//   Stubs for unit tests for suzuki_trotter()
 //------------------------------------------------------------------------------
-//
-// Stubs for unit tests for suzuki_trotter()
 
+// C++ standard library headers
 #include <cstdint>
 #include <vector>
 
+// Vampire headers
 #include "material.hpp"
 #include "sim.hpp"
 #include "sld.hpp"

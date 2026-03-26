@@ -3,7 +3,7 @@
 //   This file is part of the VAMPIRE open source package under the
 //   Free BSD licence (see licence file for details).
 //
-//   (c) Richard F L Evans 2022. All rights reserved.
+//   (c) Richard F L Evans 2026. All rights reserved.
 //
 //   Email: richard.evans@york.ac.uk
 //
@@ -25,8 +25,9 @@
 #include "../unit_tests.hpp"
 
 namespace ut{
-   namespace spinlattice{
-      void sld_setup(){
+    namespace spinlattice{
+
+      void sld_setup_mpi(){
          atoms::num_atoms = 1;
          atoms::type_array.assign(1, 0);
          atoms::x_spin_array.assign(1, 1.0);
@@ -69,58 +70,37 @@ namespace ut{
          sld::internal::spin_noise_generation_first_call = true;
       }
 
-      int suzuki_trotter_gaussian_lattice_noise_called_test(){
+      int suzuki_trotter_mpi_gaussian_noise_test(){
          sld::internal::use_llgq_thermostat = false;
-         sld_setup();
+         sld_setup_mpi();
 
          std::ostringstream captured;
          std::streambuf* original_buffer = std::cout.rdbuf(captured.rdbuf());
 
-         int suzuki_trotter_output = sld::suzuki_trotter();
+         sld::suzuki_trotter_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::type_array);
 
          std::cout.rdbuf(original_buffer);
-         std::string expected_string = "DEBUG active: entering sld::suzuki_trotter().";
+         std::string expected_string = "DEBUG active: entering sld::suzuki_trotter_step_parallel().";
          std::string expected_string_2 = "Adding lattice noise using classical noise.";
 
-         if (bool_error(suzuki_trotter_output == EXIT_SUCCESS, true, "sld::suzuki_trotter return code")) return 1;
          if (string_error(captured.str(), expected_string, "DEBUG not active, please switch on in makefile")) return 1;
          if (string_error(captured.str(), expected_string_2, "Classical noise not called")) return 1;
 
          return 0;
       }
 
-      int suzuki_trotter_LLGQ_noise_called_test(){
-         sld::internal::use_llgq_thermostat = true;
-         sld_setup();
-
-         std::ostringstream captured;
-         std::streambuf* original_buffer = std::cout.rdbuf(captured.rdbuf());
-
-         int suzuki_trotter_output = sld::suzuki_trotter();
-
-         std::cout.rdbuf(original_buffer);
-         std::string expected_string = "Use_LLGQ_Thermostat' enabled, initialising quantum noise...";
-         std::string expected_string_2 = "Adding lattice noise using LLGQ thermostat (quantum noise).";
-
-         if (bool_error(suzuki_trotter_output == EXIT_SUCCESS, true, "sld::suzuki_trotter return code")) return 1;
-         if (string_error(captured.str(), expected_string, "Quantum noise not initialised")) return 1;
-         if (string_error(captured.str(), expected_string_2, "Quantum noise not added to lattice noise")) return 1;
-
-         return 0;
-      }
-
    } // end namespace spinlattice
 
-   int spinlattice_tests(const bool verbose){
-      if(verbose) std::cout << "Testing spin-lattice module" << std::endl;
+   int spinlattice_mpi_tests(const bool verbose){
+      if(verbose) std::cout << "Testing spin-lattice MPI module" << std::endl;
 
       int error_count = 0;
-      error_count += spinlattice::suzuki_trotter_gaussian_lattice_noise_called_test();
-      error_count += spinlattice::suzuki_trotter_LLGQ_noise_called_test();
+      error_count += spinlattice::suzuki_trotter_mpi_gaussian_noise_test();
+      //error_count += spinlattice::suzuki_trotter_mpi_llgq_noise_test();
 
       if(verbose) std::cout << "================================" << std::endl;
-      if(error_count == 0) std::cout << " spin-lattice : PASS " << std::endl;
-      else std::cout << " spin-lattice : FAIL " << error_count << std::endl;
+      if(error_count == 0) std::cout << " spin-lattice MPI : PASS " << std::endl;
+      else std::cout << " spin-lattice MPI : FAIL " << error_count << std::endl;
       if(verbose) std::cout << "================================" << std::endl;
 
       return error_count;
