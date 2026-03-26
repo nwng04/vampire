@@ -56,7 +56,6 @@ namespace sim{
       if(err::check==true){std::cout << "sim::LLG_init has been called" << std::endl;}
       using namespace LLGQ_arrays;
 
-
       x_w_array.resize(atoms::num_atoms, 0.0);
       y_w_array.resize(atoms::num_atoms, 0.0);
       z_w_array.resize(atoms::num_atoms, 0.0);
@@ -182,6 +181,11 @@ namespace sim{
         //----------------------------------------
 
         for(int atom=pre_comm_si;atom<pre_comm_ei;atom++){
+#ifdef DEBUG
+            if (sim::LLGQ_arrays::first_LLGQ_call){
+               std::cout << "Noise for atom " << atom << ": " << get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]) << std::endl;
+            }
+#endif
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
@@ -503,6 +507,9 @@ namespace sim{
 
         // Wait for other processors
         vmpi::barrier();
+
+        // Disable debug print statements after first call
+        sim::LLGQ_arrays::first_LLGQ_call = false;
 
         // Increment noise index
         noise_index += 1;

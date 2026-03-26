@@ -183,7 +183,7 @@ namespace sim{
          for (int atom = 0; atom < num_atoms; ++atom) {
 #ifdef DEBUG
             if (sim::LLGQ_arrays::first_LLGQ_call){
-               std::cout << "Calculating noise for atom " << atom << ":" << get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]) << std::endl;
+               std::cout << "Noise for atom " << atom << ": " << get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]) << std::endl;
             }
 #endif
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
