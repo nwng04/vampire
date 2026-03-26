@@ -106,9 +106,8 @@ namespace sld{
       
       bool initialise_noise = false; // Flag to define state of LLG arrays (initialised/uninitialised)
 
-      // Flags set in input file to enable llgq thermostat lattice noise generation
+      // Flag set in input file to enable llgq thermostat lattice noise generation in spin-lattice simulations
       bool use_llgq_thermostat = false;
-      bool lattice_noise = false;
 
       // Flags defined to print debug messages to console for first call of each function if DEBUG flag is switched on
       bool debug_banner_printed = false;

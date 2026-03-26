@@ -39,21 +39,6 @@ namespace ut{
 
             else return 0;
         }
-
-        int interface_quantum_lattice_test(){
-            int ec = 0;
-            std::string prefix = "spin-lattice";
-            std::string word = "quantum-lattice-noise";
-            std::string value = "true";
-            bool expected_value = true;
-
-            bool matched = ::sld::match_input_parameter(prefix, word, value, "", 0);
-
-            if (!matched) return 1;
-            if (::sld::internal::lattice_noise != expected_value) return 1;
-
-            return 0;
-        }
     } // end namespace sld
 
     int sld_interface_tests(const bool verbose){
@@ -62,7 +47,6 @@ namespace ut{
         int error_count = 0;
         
         error_count += sld::interface_quantum_thermostat_test();
-        error_count += sld::interface_quantum_lattice_test();
 
         if(verbose) std::cout << "================================" << std::endl;
         if(error_count == 0) std::cout << " sld interface : PASS " << std::endl;
