@@ -141,6 +141,12 @@ namespace sim{
          // check calling of routine if error checking is activated
          if(err::check==true){std::cout << "sim::mLLG has been called" << std::endl;}
 
+#ifdef DEBUG
+         if (sim::LLGQ_arrays::first_LLGQ_call){
+            std::cout << "sim::llg_quantum_step has been called" << std::endl;
+         }
+#endif
+
          using namespace LLGQ_arrays;
 
          // Check for initialisation of LLG integration arrays
@@ -175,6 +181,11 @@ namespace sim{
 
          // K1 Step
          for (int atom = 0; atom < num_atoms; ++atom) {
+#ifdef DEBUG
+            if (sim::LLGQ_arrays::first_LLGQ_call){
+               std::cout << "Calculating noise for atom " << atom << ":" << get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]) << std::endl;
+            }
+#endif
             H[0] = atoms::x_total_spin_field_array[atom] + atoms::x_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_x[atom]);
             H[1] = atoms::y_total_spin_field_array[atom] + atoms::y_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_y[atom]);
             H[2] = atoms::z_total_spin_field_array[atom] + atoms::z_total_external_field_array[atom] + get_noise(coarse_noise_field, noise_index, M, atom_idx_z[atom]);
@@ -300,6 +311,8 @@ namespace sim{
             z_w_array[atom] = y_in_storage[atom][8] + (dt_over_6) * (k1_storage[atom][8] + 2.0 * k2_storage[atom][8] + 2.0 * k3_storage[atom][8] + k4_storage[atom][8]);
 
          }
+
+         sim::LLGQ_arrays::first_LLGQ_call = false; // Disable debug print statements after first call
 
          // Increment noise index
          noise_index += 1;

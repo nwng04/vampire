@@ -123,7 +123,8 @@ namespace sim{
    extern std::vector<std::vector<double>> y_pred_storage;
    extern std::vector<std::vector<double>> y_in_storage;
 
-   extern bool LLG_set; ///< Flag to define state of LLG arrays (initialised/uninitialised)
+   extern bool LLG_set; // Flag to define state of LLG arrays (initialised/uninitialised)
+   extern bool first_LLGQ_call; // Flag to enable debug print statements for first call of llg_quantum
 
    }
 } // end of sim namespace
