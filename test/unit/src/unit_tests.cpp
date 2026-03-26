@@ -42,6 +42,8 @@ int main(int argc, char* argv[]){
    std::cout << "--------------------------------------------------" << std::endl;
 
    if( module.utility || all ) error_count += ut::utility_tests(verbose);
+   if( module.spinlattice || all ) error_count += ut::spinlattice_tests(verbose);
+   if( module.sld_interface || all ) error_count += ut::sld_interface_tests(verbose);
 
 
    // Summary

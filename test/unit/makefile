@@ -11,14 +11,17 @@ GCC=g++
 LIBS=-lstdc++
 
 # Flags
-GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/
+GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/ -DDEBUG
 
 # Objects
 TEST_OBJECTS= \
 obj/unit_tests.o \
 obj/utility/units_test.o \
 obj/utility/utility_test.o\
-obj/utility/spin_temperature_test.o
+obj/utility/spin_temperature_test.o \
+obj/spinlattice/interface_test.o \
+obj/spinlattice/suzuki_trotter_test.o \
+obj/spinlattice/suzuki_trotter_stubs.o
 
 
 VAMPIRE_OBJECTS= \
@@ -30,9 +33,14 @@ VAMPIRE_OBJECTS= \
 ../../obj/vio/data.o \
 ../../obj/vio/globalio.o \
 ../../obj/vio/timestamp.o\
+../../obj/vio/check.o\
+../../obj/vio/string_to_x.o\
 ../../obj/constants/constants.o\
 ../../obj/spinlattice/temperatures.o\
-../../obj/spinlattice/data.o
+../../obj/spinlattice/suzuki-trotter.o\
+../../obj/spinlattice/data.o \
+../../obj/data/atoms.o\
+../../obj/spinlattice/interface.o
 
 
 EXECUTABLE=unit_tests

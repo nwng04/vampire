@@ -20,9 +20,13 @@ namespace ut{
    // simple struct specifying modules to test
    struct module_t {
       bool utility = false;
+      bool spinlattice = false;
+      bool sld_interface = false;
    };
 
    // module level functions
    int utility_tests(const bool verbose);
+   int spinlattice_tests(const bool verbose);
+   int sld_interface_tests(const bool verbose);
 
 }
