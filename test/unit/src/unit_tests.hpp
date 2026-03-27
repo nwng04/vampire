@@ -27,7 +27,7 @@ namespace ut{
    // module level functions
    int utility_tests(const bool verbose);
    int spinlattice_tests(const bool verbose);
-   //int spinlattice_mpi_tests(const bool verbose);
+   int spinlattice_mpi_tests(const bool verbose);
    int sld_interface_tests(const bool verbose);
 
    // verification methods

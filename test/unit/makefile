@@ -12,6 +12,7 @@ LIBS=-lstdc++
 
 # Flags
 GCC_CFLAGS=-O3 -std=c++17 -I../../hdr/ -I../../src/ -DDEBUG
+MPICC=mpicxx -DMPICF
 
 # Objects
 TEST_OBJECTS= \
@@ -21,7 +22,9 @@ obj/utility/utility_test.o\
 obj/utility/spin_temperature_test.o \
 obj/spinlattice/interface_test.o \
 obj/spinlattice/suzuki_trotter_test.o \
-obj/spinlattice/suzuki_trotter_stubs.o
+obj/spinlattice/suzuki_trotter_stubs.o \
+obj/spinlattice/suzuki_trotter_mpi_test.o \
+obj/spinlattice/suzuki_trotter_mpi_stubs.o
 
 
 VAMPIRE_OBJECTS= \
@@ -42,17 +45,24 @@ VAMPIRE_OBJECTS= \
 ../../obj/data/atoms.o\
 ../../obj/spinlattice/interface.o
 
+MPI_OBJECTS= \
+../../obj/spinlattice/suzuki-trotter-mpi.o
+
 
 EXECUTABLE=unit_tests
 
-all: $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) gcc
+all: $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) $(MPI_OBJECTS) gcc
 
 # Serial Targets
-gcc: $(TEST_OBJECTS) $(VAMPIRE_OBJECTS)
-	$(GCC) $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
+gcc: $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) $(MPI_OBJECTS)
+	$(MPICC) $(TEST_OBJECTS) $(VAMPIRE_OBJECTS) $(MPI_OBJECTS) $(GCC_CFLAGS) $(LIBS) -o $(EXECUTABLE)
 
 $(TEST_OBJECTS): obj/%.o: src/%.cpp
 	$(GCC) -c -o $@ $(GCC_CFLAGS) $<
+
+# ensures MPICF flag is on [required for running unit tests, by building with ${MPICC}]
+../../obj/spinlattice/suzuki-trotter-mpi.o: ../../src/spinlattice/suzuki-trotter-mpi.cpp
+	$(MPICC) -c -o $@ $(GCC_CFLAGS) $<
 
 # compile vampire objects to vampire object folder
 $(VAMPIRE_OBJECTS): ../../obj/%.o: ../../src/%.cpp

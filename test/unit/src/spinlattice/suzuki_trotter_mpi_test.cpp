@@ -66,8 +66,17 @@ namespace ut{
             sld::internal::potential_eng.assign(1, 0.0);
             sld::internal::sumJ.assign(1, 0.0);
             sld::internal::sumC.assign(1, 0.0);
+
+            sld::internal::x_coord_storage_array.assign(1, 0.0);
+            sld::internal::y_coord_storage_array.assign(1, 0.0);
+            sld::internal::z_coord_storage_array.assign(1, 0.0);
+            sld::internal::c_octants.assign(8, std::vector<int>());
+            sld::internal::b_octants.assign(8, std::vector<int>());
+
             sld::internal::classical_noise_first_call = true;
             sld::internal::spin_noise_generation_first_call = true;
+            sld::internal::debug_banner_printed = false;
+            sld::suzuki_trotter_parallel_initialized = false;
         }
 
         int suzuki_trotter_mpi_gaussian_noise_test(){
@@ -89,6 +98,26 @@ namespace ut{
             return 0;
         }
 
+        int suzuki_trotter_mpi_llgq_noise_test(){
+            sld::internal::use_llgq_thermostat = true;
+            sld::internal::initialise_noise = false;
+            sld_setup_mpi();
+
+            std::ostringstream captured;
+            std::streambuf* original_buffer = std::cout.rdbuf(captured.rdbuf());
+
+            sld::suzuki_trotter_step_parallel(atoms::x_spin_array, atoms::y_spin_array, atoms::z_spin_array, atoms::type_array);
+
+            std::cout.rdbuf(original_buffer);
+            std::string expected_string = "DEBUG active: entering sld::suzuki_trotter_step_parallel().";
+            std::string expected_string_2 = "'Use_LLGQ_Thermostat' enabled, initialising quantum noise...";
+
+            if (string_error(captured.str(), expected_string, "Quantum noise not initialised")) return 1;
+            if (string_error(captured.str(), expected_string_2, "Quantum noise not added to lattice noise")) return 1;
+
+         return 0;
+      }
+
     } // end namespace spinlattice
 
     int spinlattice_mpi_tests(const bool verbose){
@@ -96,7 +125,7 @@ namespace ut{
 
         int error_count = 0;
         error_count += spinlattice::suzuki_trotter_mpi_gaussian_noise_test();
-        //error_count += spinlattice::suzuki_trotter_mpi_llgq_noise_test();
+        error_count += spinlattice::suzuki_trotter_mpi_llgq_noise_test();
 
         if(verbose) std::cout << "================================" << std::endl;
         if(error_count == 0) std::cout << " spin-lattice MPI : PASS " << std::endl;
