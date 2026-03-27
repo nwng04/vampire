@@ -8,7 +8,17 @@
 //   Email: richard.evans@york.ac.uk
 //
 //------------------------------------------------------------------------------
-//
+
+/* 
+VAMPIRE Unit Tests
+Contains:
+- Utility Tests
+- Suzuki-Trotter Tests
+
+To run tests:
+1. Build test/unit with 'make -B'
+2. Run ./unit_tests
+*/
 
 // C++ standard library headers
 #include <iostream>
